@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "DataStateSchematics",
+  "title": "Data-state Options Schema",
+  "type": "object",
+  "description": "Add data state to existing state",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": {
+        "message": "What name should the state have?"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

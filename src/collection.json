@@ -1,0 +1,20 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "state": {
+      "description": "A blank schematic.",
+      "factory": "./state/index",
+      "schema": "./state/schema.json"
+    },
+    "container-state": {
+      "description": "",
+      "factory": "./container-state/index",
+      "schema": "./container-state/schema.json"
+    },
+    "data-state": {
+      "description": "",
+      "factory": "./data-state/index",
+      "schema": "./data-state/schema.json"
+    }
+  }
+}
