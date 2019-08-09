@@ -87,6 +87,7 @@ export function findRootReducer(host: Tree, generateDir: string): Path {
     console.log('findRootReducer ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
     console.log(dir.subfiles);
+    console.log(dir.subdirs);
 
     const moduleRe = /-root\.reducer\.ts$/;
 
@@ -108,6 +109,7 @@ export function findRootEffects(host: Tree, generateDir: string): Path {
     console.log('findRootEffects ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
     console.log(dir.subfiles);
+    console.log(dir.subdirs);
 
     const moduleRe = /-root\.effects\.ts$/;
 
