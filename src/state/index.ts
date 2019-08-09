@@ -72,10 +72,8 @@ export default function (options: StateSchematics): Rule {
 }
 
 export function addState(options: any, templatePath: string, parsedPath: string): Source {
-    const sourceTemplates = url(templatePath);
-
     return apply(
-        sourceTemplates,
+        url(templatePath),
         [
             template({
                 ...options,
