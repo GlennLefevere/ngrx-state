@@ -11,7 +11,8 @@
     "test": "npm run build && jasmine src/**/*_spec.js",
     "release-patch": "npm version patch && npm publish",
     "release-minor": "npm version minor && npm publish",
-    "release-major": "npm version patch && npm publish"
+    "release-major": "npm version patch && npm publish",
+    "postversion": "git push"
   },
   "keywords": [
     "schematics"
