@@ -84,6 +84,7 @@ export function findModule(host: Tree, generateDir: string): Path {
  * Function to find the "closest" module to a generated file's path.
  */
 export function findRootReducer(host: Tree, generateDir: string): Path {
+    console.log('findRootReducer ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
 
     const moduleRe = /-root\.reducer\.ts$/;
@@ -94,8 +95,8 @@ export function findRootReducer(host: Tree, generateDir: string): Path {
         return result;
     }
 
-    throw new Error('Could not find an NgModule. Use the skip-import '
-        + 'option to skip importing in NgModule.');
+    throw new Error('Could not find an RootReducer. Use the skip-import '
+        + 'option to skip importing in RootReducer.');
 }
 
 
@@ -103,6 +104,7 @@ export function findRootReducer(host: Tree, generateDir: string): Path {
  * Function to find the "closest" module to a generated file's path.
  */
 export function findRootEffects(host: Tree, generateDir: string): Path {
+    console.log('findRootEffects ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
 
     const moduleRe = /-root\.effects\.ts$/;
@@ -113,8 +115,8 @@ export function findRootEffects(host: Tree, generateDir: string): Path {
         return result;
     }
 
-    throw new Error('Could not find an NgModule. Use the skip-import '
-        + 'option to skip importing in NgModule.');
+    throw new Error('Could not find an RootEffects. Use the skip-import '
+        + 'option to skip importing in RootEffects.');
 }
 
 export function determineFilePath(dirEntry: DirEntry, host: Tree, moduleRe: RegExp): Path | undefined {
