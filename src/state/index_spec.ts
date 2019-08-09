@@ -52,9 +52,9 @@ describe('ngrx-state', () => {
             'import { NgModule } from \'@angular/core\';\n' +
             '\nimport { AppComponent } from \'./app.component\';\n' +
             'import { StoreModule } from \'@ngrx/store\';\n' +
-            'import { barRootReducer } from \'./reducers/bar-root.reducer\';\n' +
+            'import { barRootReducer } from \'./statemanagement/reducers/bar-root.reducer\';\n' +
             'import { EffectsModule } from \'@ngrx/effects\';\n' +
-            'import { BarRootEffects } from \'./effects/bar-root.effects\';\n' +
+            'import { BarRootEffects } from \'./statemanagement/effects/bar-root.effects\';\n' +
             '\n' +
             '@NgModule({\n' +
             '  declarations: [\n' +
