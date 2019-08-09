@@ -2,10 +2,12 @@ import {
     apply,
     chain,
     mergeWith,
+    move,
     noop,
     Rule,
     SchematicContext,
     SchematicsException,
+    Source,
     template,
     Tree,
     url
@@ -57,93 +59,32 @@ export default function (options: StateSchematics): Rule {
 
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
-            defaultState(options),
+            mergeWith(addState(options, './files/default', parsedPath.path)),
             addRootStateImportToNgModule(options, rootReducerName),
-            !data ? noop() : dataState(options),
-            !container ? noop() : containerState(options),
-            !effects ? noop() : effectsState(options),
+            !data ? noop() : mergeWith(addState(options, './files/data', parsedPath.path)),
+            !container ? noop() : mergeWith(addState(options, './files/container', parsedPath.path)),
+            !effects ? noop() : mergeWith(addState(options, './files/effects', parsedPath.path)),
             !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
             !effects ? noop() : addRootEffectsImportToNgModule(options, rootEffectsName),
         ])(tree, _context);
     };
 }
 
-export function defaultState(options: any): Rule {
-    // @ts-ignore
-    return (tree: Tree, _context: SchematicContext) => {
-        const sourceTemplates = url('./files/default');
+export function addState(options: any, templatePath: string, parsedPath: string): Source {
+    const sourceTemplates = url(templatePath);
 
-        const sourceParameterizedTemplates = apply(
-            sourceTemplates,
-            [
-                template({
-                    ...options,
-                    ...strings,
-                    functionIze
-                })
-            ]
-        );
-        return mergeWith(sourceParameterizedTemplates);
-    };
+    return apply(
+        sourceTemplates,
+        [
+            template({
+                ...options,
+                ...strings,
+                functionIze
+            }),
+            move(parsedPath)
+        ],
+    );
 }
-
-export function dataState(options: any): Rule {
-    // @ts-ignore
-    return (tree: Tree, _context: SchematicContext) => {
-        const sourceTemplates = url('./files/data');
-
-        const sourceParameterizedTemplates = apply(
-            sourceTemplates,
-            [
-                template({
-                    ...options,
-                    ...strings,
-                    functionIze
-                })
-            ]
-        );
-        return mergeWith(sourceParameterizedTemplates);
-    };
-}
-
-export function containerState(options: any): Rule {
-    // @ts-ignore
-    return (tree: Tree, _context: SchematicContext) => {
-        const sourceTemplates = url('./files/container');
-
-        const sourceParameterizedTemplates = apply(
-            sourceTemplates,
-            [
-                template({
-                    ...options,
-                    ...strings,
-                    functionIze
-                })
-            ]
-        );
-        return mergeWith(sourceParameterizedTemplates);
-    };
-}
-
-export function effectsState(options: any): Rule {
-    // @ts-ignore
-    return (tree: Tree, _context: SchematicContext) => {
-        const sourceTemplates = url('./files/effects');
-
-        const sourceParameterizedTemplates = apply(
-            sourceTemplates,
-            [
-                template({
-                    ...options,
-                    ...strings,
-                    functionIze
-                })
-            ]
-        );
-        return mergeWith(sourceParameterizedTemplates);
-    };
-}
-
 
 export function addNgrxImportsToNgModule(modulePath: string | undefined, importPath: string, name: string): Rule {
     return (host: Tree) => {
@@ -178,7 +119,6 @@ export interface RootEffectsImportOptions {
 
 export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions, classToImport: string): Rule {
     return (host: Tree) => {
-        options.flat = true;
         if (!options.module) {
             return host;
         }
@@ -187,7 +127,7 @@ export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions
         const pathToCheck = (options.path || '')
             + (options.flat ? '' : '/' + strings.dasherize(options.name));
 
-        const importPath = buildRelativePath(`.${options.module}`, '/' + findRootEffects(host, pathToCheck)).replace('.ts', '');
+        const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootEffects(host, pathToCheck)).replace('.ts', '');
 
         const declarationChange = insertImport(source, options.module, classToImport, importPath);
 
@@ -205,7 +145,6 @@ export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions
 
 export function addRootStateImportToNgModule(options: RootEffectsImportOptions, classToImport: string): Rule {
     return (host: Tree) => {
-        options.flat = true;
         if (!options.module) {
             return host;
         }
@@ -214,7 +153,7 @@ export function addRootStateImportToNgModule(options: RootEffectsImportOptions, 
         const pathToCheck = (options.path || '')
             + (options.flat ? '' : '/' + strings.dasherize(options.name));
 
-        const importPath = buildRelativePath(`.${options.module}`, '/' + findRootReducer(host, pathToCheck)).replace('.ts', '');
+        const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootReducer(host, pathToCheck)).replace('.ts', '');
 
         const declarationChange = insertImport(source, options.module, classToImport, importPath);
 

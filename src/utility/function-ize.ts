@@ -1,4 +1,4 @@
-import {camelize} from '@ngrx/store/schematics-core/utility/strings';
+import {camelize} from '@angular-devkit/core/src/utils/strings';
 
 export function functionIze(value: string): string {
     let result = camelize(value);
