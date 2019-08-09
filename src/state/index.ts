@@ -17,8 +17,6 @@ import {
     addImportToModule,
     buildRelativePath,
     findModuleFromOptions,
-    findRootEffects,
-    findRootReducer,
     insertImport,
     readIntoSourceFile
 } from '../utility/find-module';
@@ -63,12 +61,12 @@ export default function (options: StateSchematics): Rule {
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
             mergeWith(addState(options, './files/default', parsedPath.path)),
-            addRootStateImportToNgModule(options, rootReducerName),
+            addImport(options, rootReducerName, '/statemanagement/reducers/'),
             !data ? noop() : mergeWith(addState(options, './files/data', parsedPath.path)),
             !container ? noop() : mergeWith(addState(options, './files/container', parsedPath.path)),
             !effects ? noop() : mergeWith(addState(options, './files/effects', parsedPath.path)),
             !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
-            !effects ? noop() : addRootEffectsImportToNgModule(options, rootEffectsName),
+            !effects ? noop() : addImport(options, rootEffectsName,'/statemanagement/effects/'),
         ])(tree, _context);
     };
 }
@@ -120,17 +118,17 @@ export interface RootEffectsImportOptions {
     path?: string;
 }
 
-export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions, classToImport: string): Rule {
+export function addImport(options: any, classToImport: string, path: string): Rule {
     return (host: Tree) => {
         if (!options.module) {
             return host;
         }
         const source = readIntoSourceFile(host, options.module);
 
-        const pathToCheck = (options.path || '');
-           // + '/statemanagement';
+        const pathToCheck = (options.path || '')
+            + path + strings.dasherize(classToImport);
 
-        const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootEffects(host, pathToCheck)).replace('.ts', '');
+        const importPath = buildRelativePath(`//${options.module}`, pathToCheck);
 
         const declarationChange = insertImport(source, options.module, classToImport, importPath);
 
@@ -142,31 +140,6 @@ export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions
 
         host.commitUpdate(declarationRecorder);
 
-        return host;
-    }
-}
-
-export function addRootStateImportToNgModule(options: RootEffectsImportOptions, classToImport: string): Rule {
-    return (host: Tree) => {
-        if (!options.module) {
-            return host;
-        }
-        const source = readIntoSourceFile(host, options.module);
-
-        const pathToCheck = (options.path || '');
-            //+ '/statemanagement';
-
-        const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootReducer(host, pathToCheck)).replace('.ts', '');
-
-        const declarationChange = insertImport(source, options.module, classToImport, importPath);
-
-        const declarationRecorder = host.beginUpdate(options.module);
-
-        if (declarationChange instanceof InsertChange) {
-            declarationRecorder.insertLeft(declarationChange.pos, declarationChange.toAdd);
-        }
-
-        host.commitUpdate(declarationRecorder);
         return host;
     }
 }
