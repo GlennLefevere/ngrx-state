@@ -7,7 +7,6 @@ import {
     Rule,
     SchematicContext,
     SchematicsException,
-    Source,
     template,
     Tree,
     url
@@ -60,19 +59,19 @@ export default function (options: StateSchematics): Rule {
 
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
-            mergeWith(addState(options, './files/default', parsedPath.path)),
+            addState(options, './files/default', parsedPath.path),
             addImport(options, rootReducerName, '/statemanagement/reducers/'),
-            !data ? noop() : mergeWith(addState(options, './files/data', parsedPath.path)),
-            !container ? noop() : mergeWith(addState(options, './files/container', parsedPath.path)),
-            !effects ? noop() : mergeWith(addState(options, './files/effects', parsedPath.path)),
+            !data ? noop() : addState(options, './files/data', parsedPath.path),
+            !container ? noop() : addState(options, './files/container', parsedPath.path),
+            !effects ? noop() : addState(options, './files/effects', parsedPath.path),
             !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
-            !effects ? noop() : addImport(options, rootEffectsName,'/statemanagement/effects/'),
+            !effects ? noop() : addImport(options, rootEffectsName, '/statemanagement/effects/'),
         ])(tree, _context);
     };
 }
 
-export function addState(options: any, templatePath: string, parsedPath: string): Source {
-    return apply(
+export function addState(options: any, templatePath: string, parsedPath: string): Rule {
+    return mergeWith(apply(
         url(templatePath),
         [
             template({
@@ -82,7 +81,7 @@ export function addState(options: any, templatePath: string, parsedPath: string)
             }),
             move(parsedPath)
         ],
-    );
+    ));
 }
 
 export function addNgrxImportsToNgModule(modulePath: string | undefined, importPath: string, name: string): Rule {
