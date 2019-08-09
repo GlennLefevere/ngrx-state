@@ -127,8 +127,8 @@ export function addRootEffectsImportToNgModule(options: RootEffectsImportOptions
         }
         const source = readIntoSourceFile(host, options.module);
 
-        const pathToCheck = (options.path || '')
-            + '/statemanagement';
+        const pathToCheck = (options.path || '');
+           // + '/statemanagement';
 
         const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootEffects(host, pathToCheck)).replace('.ts', '');
 
@@ -153,8 +153,8 @@ export function addRootStateImportToNgModule(options: RootEffectsImportOptions, 
         }
         const source = readIntoSourceFile(host, options.module);
 
-        const pathToCheck = (options.path || '')
-            + '/statemanagement';
+        const pathToCheck = (options.path || '');
+            //+ '/statemanagement';
 
         const importPath = buildRelativePath(`//${options.module}`, options.path + '/' + findRootReducer(host, pathToCheck)).replace('.ts', '');
 
