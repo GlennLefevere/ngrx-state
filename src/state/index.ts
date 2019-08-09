@@ -32,6 +32,7 @@ import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
 export default function (options: StateSchematics): Rule {
     // @ts-ignore
     return (tree: Tree, _context: SchematicContext) => {
+        console.log(options);
         const {data, container, effects} = options;
         const workspace = getWorkspace(tree);
         if (!options.project) {
@@ -56,6 +57,8 @@ export default function (options: StateSchematics): Rule {
 
         const rootEffectsName = strings.classify(`${options.name}RootEffects`);
         const effectsName = `EffectsModule.forFeature(${rootEffectsName}),`;
+
+        console.log(options);
 
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
