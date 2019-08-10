@@ -47,15 +47,11 @@ describe('data-state', () => {
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-        const tree = await runner.runSchematicAsync('data-state', {
+        await runner.runSchematicAsync('data-state', {
             name: 'bar',
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-        const reducerFile = '/projects/bar/src/app/statemanagement/reducers/bar-root.reducer.ts';
-        console.log(tree.readContent(reducerFile));
-
-        //console.log(tree.files);
     });
 
 
@@ -68,15 +64,11 @@ describe('data-state', () => {
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-        const tree = await runner.runSchematicAsync('data-state', {
+        await runner.runSchematicAsync('data-state', {
             name: 'bar',
             project: 'bar',
             flat: true
         }, appTree).toPromise();
 
-        const reducerFile = '/projects/bar/src/app/statemanagement/reducers/bar-root.reducer.ts';
-        console.log(tree.readContent(reducerFile));
-
-        //console.log(tree.files);
     });
 });
