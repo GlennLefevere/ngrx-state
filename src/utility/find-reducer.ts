@@ -26,7 +26,7 @@ export interface AddReducerContext {
 export function createAddReducerContext(host: Tree, options: any, reducerType: string): AddReducerContext {
     const rootReducerFileName = findRootReducer(host, options.path).replace('.ts', '');
     const reducerName = dasherize(options.name + classify(reducerType) + 'Reducer');
-    const reducerFileName = constructDestinationPath(options, reducerName);
+    const reducerFileName = constructDestinationPath(options, reducerName, 'reducer');
     const relativeReducerFileName = buildRelativePath(options.path + '/' + rootReducerFileName, reducerFileName);
 
     return {
@@ -37,8 +37,8 @@ export function createAddReducerContext(host: Tree, options: any, reducerType: s
     }
 }
 
-export function constructDestinationPath(options: any, reducerName: string): string {
-    return options.path + '/statemanagement/reducers/data/' + reducerName;
+export function constructDestinationPath(options: any, reducerType: string, extention: string): string {
+    return options.path + '/statemanagement/reducers/data/' + dasherize(options.name + reducerType) + '.' + extention;
 }
 
 export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
