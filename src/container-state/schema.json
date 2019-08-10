@@ -15,6 +15,23 @@
       "x-prompt": {
         "message": "What name should the state have?"
       }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the component.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "module": {
+      "type": "string",
+      "description": "The module to update"
     }
   },
   "required": [

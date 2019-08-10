@@ -1,22 +1,46 @@
-import {apply, mergeWith, Rule, SchematicContext, template, Tree, url} from '@angular-devkit/schematics';
-import {strings} from '@angular-devkit/core';
-import {functionIze} from '../utility/function-ize';
+import {chain, Rule, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
+import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
+import {buildInjectionChanges, createAddReducerContext} from '../utility/find-reducer';
+import {copyFiles} from '../utility/copy-files';
 
-export default function(_options: any): Rule {
-    // @ts-ignore
+export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
-        const sourceTemplates = url('./files');
+        const workspace = getWorkspace(tree);
+        if (!options.project) {
+            throw new SchematicsException('Option (project) is required.');
+        }
 
-        const sourceParameterizedTemplates = apply(
-            sourceTemplates,
+        const project = workspace.projects[options.project];
+
+        if (options.path === undefined) {
+            options.path = buildDefaultPath(project);
+        }
+
+        const parsedPath = parseName(options.path, options.name);
+        options.name = parsedPath.name;
+        options.path = parsedPath.path;
+
+        return chain(
             [
-                template({
-                    ..._options,
-                    ...strings,
-                    functionIze
-                })
+                test(options),
+                copyFiles(options, './files', options.path)
             ]
-        );
-        return mergeWith(sourceParameterizedTemplates);
+        )
     };
+}
+
+function test(options: any): Rule {
+    return (host: Tree) => {
+        const context = createAddReducerContext(host, options, 'data');
+
+        const changes = buildInjectionChanges(context, host, options);
+
+        const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootReducerFileName + '.ts');
+        for (const change of changes) {
+            declarationRecorder.insertLeft(change.pos, change.toAdd);
+        }
+        host.commitUpdate(declarationRecorder);
+
+        return host;
+    }
 }

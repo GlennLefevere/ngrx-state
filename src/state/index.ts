@@ -1,16 +1,4 @@
-import {
-    apply,
-    chain,
-    mergeWith,
-    move,
-    noop,
-    Rule,
-    SchematicContext,
-    SchematicsException,
-    template,
-    Tree,
-    url
-} from '@angular-devkit/schematics';
+import {chain, noop, Rule, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
 import {strings} from '@angular-devkit/core';
 import {
     addImportToModule,
@@ -22,6 +10,7 @@ import {
 import {functionIze} from '../utility/function-ize';
 import {InsertChange} from '../utility/change';
 import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
+import {copyFiles} from '../utility/copy-files';
 
 
 // You don't have to export the function as default. You can also have more than one rule factory
@@ -56,29 +45,15 @@ export default function (options: StateSchematics): Rule {
 
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
-            addState(options, './files/default', parsedPath.path),
+            copyFiles(options, './files/default', parsedPath.path),
             addImport(options, rootReducerName, '/statemanagement/reducers/'),
-            !data ? noop() : addState(options, './files/data', parsedPath.path),
-            !container ? noop() : addState(options, './files/container', parsedPath.path),
-            !effects ? noop() : addState(options, './files/effects', parsedPath.path),
+            !data ? noop() : copyFiles(options, './files/data', parsedPath.path),
+            !container ? noop() : copyFiles(options, './files/container', parsedPath.path),
+            !effects ? noop() : copyFiles(options, './files/effects', parsedPath.path),
             !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
             !effects ? noop() : addImport(options, rootEffectsName, '/statemanagement/effects/'),
         ])(tree, _context);
     };
-}
-
-export function addState(options: any, templatePath: string, parsedPath: string): Rule {
-    return mergeWith(apply(
-        url(templatePath),
-        [
-            template({
-                ...options,
-                ...strings,
-                functionIze
-            }),
-            move(parsedPath)
-        ],
-    ));
 }
 
 export function addNgrxImportsToNgModule(modulePath: string | undefined, importPath: string, name: string): Rule {
@@ -103,13 +78,6 @@ export function addNgrxImportsToNgModule(modulePath: string | undefined, importP
 
         return host;
     };
-}
-
-export interface RootEffectsImportOptions {
-    module?: string;
-    name: string;
-    flat?: boolean;
-    path?: string;
 }
 
 export function addImport(options: any, classToImport: string, path: string): Rule {
