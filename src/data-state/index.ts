@@ -3,6 +3,7 @@ import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
 import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
 import {copyFiles} from '../utility/copy-files';
 import {buildAddStateChanges, createAddStateContext} from '../utility/find-state';
+import {buildAddSelectorChanges, createAddSelectorContext} from '../utility/find-selector';
 
 export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
@@ -25,7 +26,8 @@ export default function (options: DataStateSchematics): Rule {
             [
                 addReducer(options),
                 addState(options),
-                copyFiles(options, './files', options.path)
+                copyFiles(options, './files', options.path),
+                addSelectorImport(options)
             ]
         )
     };
@@ -54,6 +56,23 @@ function addState(options: any): Rule {
         const changes = buildAddStateChanges(context, host, options);
 
         const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootStateFileName + '.ts');
+
+        for (const change of changes) {
+            declarationRecorder.insertLeft(change.pos, change.toAdd);
+        }
+        host.commitUpdate(declarationRecorder);
+
+        return host;
+    }
+}
+
+function addSelectorImport(options: any): Rule {
+    return (host: Tree) => {
+        const context = createAddSelectorContext(host, options, 'data');
+
+        const changes = buildAddSelectorChanges(context, host, options);
+
+        const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootSelectorFileName + '.ts');
 
         for (const change of changes) {
             declarationRecorder.insertLeft(change.pos, change.toAdd);
