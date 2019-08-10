@@ -1,39 +1,18 @@
-import {DirEntry, SchematicsException, Tree} from '@angular-devkit/schematics';
-import {join, Path} from '@angular-devkit/core';
-import {determineFilePath, getSourceNodes, insertImport} from './find-module';
+import {SchematicsException, Tree} from '@angular-devkit/schematics';
+import {Path} from '@angular-devkit/core';
+import {getSourceNodes, insertImport} from './find-module';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {InsertChange} from '@schematics/angular/utility/change';
 import * as ts from 'typescript';
 import {normalize} from 'path';
 import {functionIze} from './function-ize';
+import {findFile} from './find-file';
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
-    let dir: DirEntry | null = host.getDir('/' + generateDir);
-
     const moduleRe = /-root\.reducer\.ts$/;
 
-    let result = determineFilePath(dir, host, moduleRe);
-
-    if (result) {
-        return result;
-    }
-
-    while (dir) {
-        const matches = dir.subfiles.filter(p => moduleRe.test(p));
-
-        if (matches.length == 1) {
-            return join(dir.path, matches[0]);
-        } else if (matches.length > 1) {
-            throw new Error('More than one root-reducer matches. Use skip-import option to skip importing '
-                + 'the state into the closest root-reducer.');
-        }
-
-        dir = dir.parent;
-    }
-
-    throw new Error('Could not find an RootReducer. Use the skip-import '
-        + 'option to skip importing in RootReducer.');
+    return findFile(host, generateDir, moduleRe);
 }
 
 export interface AddReducerContext {
@@ -62,8 +41,8 @@ export function constructDestinationPath(options: any, reducerName: string): str
     return options.path + '/statemanagement/reducers/data/' + reducerName;
 }
 
-export function createConstructorForInjection(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
-    let toAdd = '\n  ' + context.reducerType + ': ' + context.reducerName + ',';
+export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
+    let toAdd = '\n  ' + context.reducerType + ': ' + functionIze(context.reducerName) + ',';
     const rootReducerNameArray = context.rootReducerFileName.split('/');
     const rootReducerName = functionIze(rootReducerNameArray[rootReducerNameArray.length - 1].replace('.', '-'));
 
@@ -85,23 +64,19 @@ export function createConstructorForInjection(context: AddReducerContext, nodes:
 
     const syntaxList = objectLiteralExpression.getChildren().filter(n => n.kind === ts.SyntaxKind.SyntaxList);
 
-    console.log('syntaxList.length: ' + syntaxList.length);
     let positon: number = 0;
     if (syntaxList.length > 0) {
         let result = syntaxList.sort((a, b) => (a.pos > b.pos) ? 1 : -1).map(n => n.pos);
-        console.log('result: ' + result);
-        console.log('result.length: ' + result.length);
         positon = result[result.length - 1];
     } else if (syntaxList.length == 0) {
         positon = objectLiteralExpression.pos;
     } else {
         throw new SchematicsException('ObjectLiteralExpression doesn\'t have children for some reason');
     }
-    console.log('positon: ' + positon);
     return new InsertChange(context.rootReducerFileName, positon + 1, toAdd);
 }
 
-export function buildInjectionChanges(context: AddReducerContext, host: Tree, options: any): InsertChange[] {
+export function buildAddReducerChanges(context: AddReducerContext, host: Tree, options: any): InsertChange[] {
     const text = host.read(normalize(options.path + '/' + context.rootReducerFileName + '.ts'));
     if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
     const sourceText = text.toString('utf-8');
@@ -110,12 +85,8 @@ export function buildInjectionChanges(context: AddReducerContext, host: Tree, op
 
     const nodes = getSourceNodes(sourceFile);
 
-    const constructorChange: InsertChange = createConstructorForInjection(context, nodes);
-
-
     return [
-        constructorChange,
+        createReducerChange(context, nodes),
         insertImport(sourceFile, context.rootReducerFileName, functionIze(context.reducerName), context.relativeReducerFileName) as InsertChange
     ];
-
 }
