@@ -105,7 +105,7 @@ export function findRootReducer(host: Tree, generateDir: string): Path {
 /**
  * Function to find the "closest" module to a generated file's path.
  */
-export function findRootEffects(host: Tree, generateDir: string): Path {
+/*export function findRootEffects(host: Tree, generateDir: string): Path {
     console.log('findRootEffects ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
     console.log(dir.subfiles);
@@ -121,7 +121,7 @@ export function findRootEffects(host: Tree, generateDir: string): Path {
 
     throw new Error('Could not find an RootEffects. Use the skip-import '
         + 'option to skip importing in RootEffects.');
-}
+}*/
 
 export function determineFilePath(dirEntry: DirEntry, host: Tree, moduleRe: RegExp): Path | undefined {
     let result;
