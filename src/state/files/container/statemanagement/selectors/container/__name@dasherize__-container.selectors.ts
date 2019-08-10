@@ -1,9 +1,9 @@
 import {createSelector} from '@ngrx/store';
-import {getGroupState} from '../group-root.selectors';
-import {__nameDasherize__RootState} from '../../state/group-root.state';
+import {get<%= classify(name) %>State} from '../<%= dasherize(name) %>-root.selectors';
+import {<%= classify(name) %>RootState} from '../../state/<%= dasherize(name) %>-root.state';
 
-export const selectGroupContainerState = createSelector(
-  getGroupState,
-  (state: __nameDasherize__RootState) => state.container
+export const select<%= classify(name) %>ContainerState = createSelector(
+  get<%= classify(name) %>State,
+  (state: <%= classify(name) %>RootState) => state.container
 );
 
