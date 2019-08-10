@@ -2,13 +2,8 @@ import {chain, Rule, SchematicContext, SchematicsException, Tree} from '@angular
 import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
 import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
 import {copyFiles} from '../utility/copy-files';
-import {AddStateContext, buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
-import {addImports, AddSelectorContext, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
-import {join, normalize, relative} from 'path';
-import {insertImport} from '../utility/find-module';
-import * as ts from 'typescript';
-import {InsertChange} from '../utility/change';
-import {dasherize} from '@angular-devkit/core/src/utils/strings';
+import {buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
+import {addImports, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
 
 export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
