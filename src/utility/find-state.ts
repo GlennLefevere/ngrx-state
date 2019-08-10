@@ -76,3 +76,29 @@ export function buildAddStateChanges(context: AddStateContext, host: Tree, optio
         insertImport(sourceFile, context.rootStateFileName, classify(context.stateName), context.relativeStateFileName) as InsertChange
     ];
 }
+
+
+export function getStateName(context: AddStateContext, host: Tree, options: any): string {
+    const text = host.read(normalize(options.path + '/' + context.rootStateFileName + '.ts'));
+    if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
+    const sourceText = text.toString('utf-8');
+
+    const sourceFile = ts.createSourceFile(context.rootStateFileName, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+
+    const nodes = getSourceNodes(sourceFile);
+
+    return getStateNameFromNodes(context, nodes);
+}
+
+function getStateNameFromNodes(context: AddStateContext, nodes: ts.Node[]): string {
+    const constNode = nodes.filter(n => n.kind === ts.SyntaxKind.Identifier).filter(n => n.getFullText().includes('RootState'));
+
+    if (!constNode || constNode.length == 0) {
+        throw new SchematicsException(`expected Variable in ${context.rootStateFileName}`);
+    } else if (constNode.length > 1) {
+        throw new SchematicsException(`Many Variables with get*RootState in ${context.rootStateFileName}`);
+    }
+    const node = constNode[0];
+
+    return node.getFullText().replace(/\s/g, '');
+}
