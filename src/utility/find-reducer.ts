@@ -38,7 +38,7 @@ export function createAddReducerContext(host: Tree, options: any, reducerType: s
 }
 
 export function constructDestinationPath(options: any, reducerType: string, folder: string, extention: string): string {
-    return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name + classify(reducerType)) + '.' + extention;
+    return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name ) + '-' + reducerType + '.' + extention;
 }
 
 export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
