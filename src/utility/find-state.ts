@@ -37,7 +37,7 @@ export function createAddStateContext(host: Tree, options: any, stateType: strin
 }
 
 function createStateChange(context: AddStateContext, nodes: ts.Node[]): InsertChange {
-    let toAdd = '\n  ' + context.stateType + ': ' + classify(context.stateName) + ',';
+    let toAdd = '\n  ' + context.stateType + ': ' + classify(context.stateName) + ';';
     const rootStateNameArray = context.rootStateFileName.split('/');
     const rootStateName = classify(rootStateNameArray[rootStateNameArray.length - 1].replace('.', '-'));
 
