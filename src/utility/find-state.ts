@@ -25,7 +25,7 @@ export interface AddStateContext {
 export function createAddStateContext(host: Tree, options: any, stateType: string): AddStateContext {
     const rootStateFileName = findRootState(host, options.path).replace('.ts', '');
     const stateName = dasherize(options.name + classify(stateType) + 'State');
-    const stateFileName = constructDestinationPath(options, stateName, 'state');
+    const stateFileName = constructDestinationPath(options, stateType, 'state', 'state');
     const relativeStateFileName = buildRelativePath(options.path + '/' + rootStateFileName, stateFileName);
 
     return {
