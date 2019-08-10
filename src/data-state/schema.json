@@ -32,6 +32,14 @@
     "module": {
       "type": "string",
       "description": "The module to update"
+    },
+    "selectorName": {
+      "type": "string",
+      "description": "The selectorName"
+    },
+    "stateName": {
+      "type": "string",
+      "description": "The state name"
     }
   },
   "required": [

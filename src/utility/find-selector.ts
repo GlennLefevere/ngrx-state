@@ -1,11 +1,13 @@
-import {SchematicsException, Tree} from '@angular-devkit/schematics';
+import {Rule, SchematicsException, Tree} from '@angular-devkit/schematics';
 import {Path} from '@angular-devkit/core';
 import {findFile} from './find-file';
-import {normalize, relative} from 'path';
+import {join, normalize, relative} from 'path';
 import {constructDestinationPath} from './find-reducer';
 import * as ts from 'typescript';
-import {InsertChange} from '@schematics/angular/utility/change';
 import {getSourceNodes, insertImport} from './find-module';
+import {AddStateContext} from './find-state';
+import {dasherize} from '@angular-devkit/core/src/utils/strings';
+import {InsertChange} from './change';
 
 export function findRootSelector(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.selectors\.ts$/;
@@ -36,17 +38,17 @@ function determineSelectorName(context: AddSelectorContext, nodes: ts.Node[]): s
 
     if (!constNode || constNode.length == 0) {
         throw new SchematicsException(`expected Variable in ${context.rootSelectorFileName}`);
-    } else if(constNode.length > 1) {
-        throw new SchematicsException(`Many Variables with get*RootState in ${context.rootSelectorFileName}`);
+    } else if (constNode.length > 1) {
+        throw new SchematicsException(`Many Variables with get*State in ${context.rootSelectorFileName}`);
     }
 
     const node = constNode[0];
 
-    return node.getFullText().replace(/\s/g,'');
+    return node.getFullText().replace(/\s/g, '');
 }
 
 
-export function buildAddSelectorChanges(context: AddSelectorContext, host: Tree, options: any): InsertChange[] {
+export function getSelectorName(context: AddSelectorContext, host: Tree, options: any): string {
     const text = host.read(normalize(options.path + '/' + context.rootSelectorFileName + '.ts'));
     if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
     const sourceText = text.toString('utf-8');
@@ -55,9 +57,34 @@ export function buildAddSelectorChanges(context: AddSelectorContext, host: Tree,
 
     const nodes = getSourceNodes(sourceFile);
 
-    const selectorName = determineSelectorName(context, nodes);
+    return determineSelectorName(context, nodes);
+}
 
-    return [
-        insertImport(sourceFile, context.rootSelectorFileName, selectorName, context.relativeSelectorFileName) as InsertChange
-    ];
+export function addImports(options: any, selectorContext: AddSelectorContext, stateContext: AddStateContext): Rule {
+    return (host: Tree) => {
+        const path = '/statemanagement/selectors/' + selectorContext.selectorType + '/' + dasherize(options.name) + '-' + selectorContext.selectorType + '.selectors';
+
+        const stateRelativePath = relative(join(options.path, path), options.path + '/' + stateContext.rootStateFileName);
+        const selectorRelativePath = relative(join(options.path, path), options.path + '/' + selectorContext.rootSelectorFileName);
+
+        const text = host.read(normalize(options.path + '/' + path + '.ts'));
+        if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
+        const sourceText = text.toString('utf-8');
+
+        const stateSourceFile = ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+
+        let changes = [
+            insertImport(stateSourceFile, path, options.selectorName, selectorRelativePath) as InsertChange,
+            insertImport(stateSourceFile, path, options.stateName, stateRelativePath) as InsertChange,
+        ];
+
+        const declarationRecorder = host.beginUpdate(options.path + '/' + path + '.ts');
+
+        for (const change of changes) {
+            declarationRecorder.insertLeft(change.pos, change.toAdd);
+        }
+        host.commitUpdate(declarationRecorder);
+
+        return host;
+    }
 }

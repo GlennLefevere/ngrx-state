@@ -2,8 +2,13 @@ import {chain, Rule, SchematicContext, SchematicsException, Tree} from '@angular
 import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
 import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
 import {copyFiles} from '../utility/copy-files';
-import {buildAddStateChanges, createAddStateContext} from '../utility/find-state';
-import {buildAddSelectorChanges, createAddSelectorContext} from '../utility/find-selector';
+import {AddStateContext, buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
+import {addImports, AddSelectorContext, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
+import {join, normalize, relative} from 'path';
+import {insertImport} from '../utility/find-module';
+import * as ts from 'typescript';
+import {InsertChange} from '../utility/change';
+import {dasherize} from '@angular-devkit/core/src/utils/strings';
 
 export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
@@ -22,12 +27,18 @@ export default function (options: DataStateSchematics): Rule {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
 
+        const selectorContext = createAddSelectorContext(tree, options, 'data');
+        const stateContext = createAddStateContext(tree, options, 'data');
+
+        options.selectorName = getSelectorName(selectorContext, tree, options);
+        options.stateName = getStateName(stateContext, tree, options);
+
         return chain(
             [
                 addReducer(options),
                 addState(options),
                 copyFiles(options, './files', options.path),
-                addSelectorImport(options)
+                addImports(options, selectorContext, stateContext)
             ]
         )
     };
@@ -56,23 +67,6 @@ function addState(options: any): Rule {
         const changes = buildAddStateChanges(context, host, options);
 
         const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootStateFileName + '.ts');
-
-        for (const change of changes) {
-            declarationRecorder.insertLeft(change.pos, change.toAdd);
-        }
-        host.commitUpdate(declarationRecorder);
-
-        return host;
-    }
-}
-
-function addSelectorImport(options: any): Rule {
-    return (host: Tree) => {
-        const context = createAddSelectorContext(host, options, 'data');
-
-        const changes = buildAddSelectorChanges(context, host, options);
-
-        const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootSelectorFileName + '.ts');
 
         for (const change of changes) {
             declarationRecorder.insertLeft(change.pos, change.toAdd);
