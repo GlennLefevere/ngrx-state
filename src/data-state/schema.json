@@ -16,6 +16,17 @@
         "message": "What name should the state have?"
       }
     },
+    "type": {
+      "type": "string",
+      "description": "The state type",
+      "$default": {
+        "$source": "argv",
+        "index": 1
+      },
+      "x-prompt": {
+        "message": "What is the type of the state?"
+      }
+    },
     "path": {
       "type": "string",
       "format": "path",
@@ -43,6 +54,7 @@
     }
   },
   "required": [
-    "name"
+    "name",
+    "type"
   ]
 }

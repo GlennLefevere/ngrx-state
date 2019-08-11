@@ -1,6 +1,9 @@
 import {apply, mergeWith, move, Rule, template, url} from '@angular-devkit/schematics';
 import {strings} from '@angular-devkit/core';
-import {functionIze} from './function-ize';
+import {concatAndFunctionIze, functionIze} from './function-ize';
+import {concatAndCamelize} from './concat-and-camelize';
+import {concatAndDasherize} from './concat-and-dasherize';
+import {concatAndClassify} from './concat-and-classify';
 
 export function copyFiles(options: any, templatePath: string, parsedPath: string): Rule {
     return mergeWith(apply(
@@ -9,7 +12,11 @@ export function copyFiles(options: any, templatePath: string, parsedPath: string
             template({
                 ...options,
                 ...strings,
-                functionIze
+                functionIze,
+                concatAndCamelize,
+                concatAndFunctionIze,
+                concatAndDasherize,
+                concatAndClassify
             }),
             move(parsedPath)
         ],
