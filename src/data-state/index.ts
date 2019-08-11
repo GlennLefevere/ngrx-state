@@ -1,9 +1,9 @@
 import {chain, Rule, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
 import {buildDefaultPath, getWorkspace, parseName} from '../utility/config';
-import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
 import {copyFiles} from '../utility/copy-files';
 import {buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
 import {addImports, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
+import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
 
 export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
@@ -41,7 +41,7 @@ export default function (options: DataStateSchematics): Rule {
 
 function addReducer(options: any): Rule {
     return (host: Tree) => {
-        const context = createAddReducerContext(host, options, 'data');
+        const context = createAddReducerContext(host, options, options.type);
 
         const changes = buildAddReducerChanges(context, host, options);
 
@@ -57,7 +57,7 @@ function addReducer(options: any): Rule {
 
 function addState(options: any): Rule {
     return (host: Tree) => {
-        const context = createAddStateContext(host, options, 'data');
+        const context = createAddStateContext(host, options, options.type);
 
         const changes = buildAddStateChanges(context, host, options);
 

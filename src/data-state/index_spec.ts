@@ -49,6 +49,7 @@ describe('data-state', () => {
         }, appTree).toPromise();
         await runner.runSchematicAsync('data-state', {
             name: 'bar',
+            type: 'data',
             project: 'bar',
             flat: true
         }, appTree).toPromise();
@@ -66,6 +67,7 @@ describe('data-state', () => {
         }, appTree).toPromise();
         await runner.runSchematicAsync('data-state', {
             name: 'bar',
+            type: 'data',
             project: 'bar',
             flat: true
         }, appTree).toPromise();
