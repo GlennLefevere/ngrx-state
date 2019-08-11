@@ -74,15 +74,19 @@ export function addImports(options: any, selectorContext: AddSelectorContext, st
 
         const stateSourceFile = ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
 
+        console.log(stateSourceFile, path, options.selectorName, selectorRelativePath);
+
         let changes = [
-            insertImport(stateSourceFile, path, options.selectorName, selectorRelativePath) as InsertChange,
-            insertImport(stateSourceFile, path, options.stateName, stateRelativePath) as InsertChange,
+            insertImport(stateSourceFile, path, options.selectorName, selectorRelativePath),
+            insertImport(stateSourceFile, path, options.stateName, stateRelativePath),
         ];
 
         const declarationRecorder = host.beginUpdate(options.path + '/' + path + '.ts');
 
         for (const change of changes) {
-            declarationRecorder.insertLeft(change.pos, change.toAdd);
+            if(change instanceof InsertChange) {
+                declarationRecorder.insertLeft(change.pos, change.toAdd);
+            }
         }
         host.commitUpdate(declarationRecorder);
 

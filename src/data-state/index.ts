@@ -22,8 +22,8 @@ export default function (options: DataStateSchematics): Rule {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
 
-        const selectorContext = createAddSelectorContext(tree, options, 'data');
-        const stateContext = createAddStateContext(tree, options, 'data');
+        const selectorContext = createAddSelectorContext(tree, options, options.type);
+        const stateContext = createAddStateContext(tree, options, options.type);
 
         options.selectorName = getSelectorName(selectorContext, tree, options);
         options.stateName = getStateName(stateContext, tree, options);
@@ -64,7 +64,9 @@ function addState(options: any): Rule {
         const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootStateFileName + '.ts');
 
         for (const change of changes) {
-            declarationRecorder.insertLeft(change.pos, change.toAdd);
+            if (typeof change !== undefined) {
+                declarationRecorder.insertLeft(change.pos, change.toAdd);
+            }
         }
         host.commitUpdate(declarationRecorder);
 

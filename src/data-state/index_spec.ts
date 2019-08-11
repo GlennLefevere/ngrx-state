@@ -41,22 +41,25 @@ describe('data-state', () => {
     it('works with container', async () => {
         appTree = await runner.runSchematicAsync('state', {
             name: 'bar',
-            data: false,
+            data: true,
             container: true,
             effects: true,
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-        await runner.runSchematicAsync('data-state', {
+        const tree = await runner.runSchematicAsync('data-state', {
             name: 'bar',
-            type: 'data',
+            type: 'custom',
             project: 'bar',
             flat: true
         }, appTree).toPromise();
+
+        // console.log(tree.files);
+        console.log(tree.readContent('/projects/bar/src/app/statemanagement/selectors/custom/bar-custom.selectors.ts'));
     });
 
 
-    it('works without data', async () => {
+/*    it('works without data', async () => {
         appTree = await runner.runSchematicAsync('state', {
             name: 'bar',
             data: false,
@@ -72,5 +75,5 @@ describe('data-state', () => {
             flat: true
         }, appTree).toPromise();
 
-    });
+    });*/
 });
