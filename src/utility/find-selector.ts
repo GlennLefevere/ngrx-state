@@ -8,6 +8,7 @@ import {getSourceNodes, insertImport} from './find-module';
 import {AddStateContext} from './find-state';
 import {dasherize} from '@angular-devkit/core/src/utils/strings';
 import {InsertChange} from './change';
+import {buildRelativePath} from '@schematics/angular/utility/find-module';
 
 export function findRootSelector(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.selectors\.ts$/;
@@ -64,8 +65,8 @@ export function addImports(options: any, selectorContext: AddSelectorContext, st
     return (host: Tree) => {
         const path = '/statemanagement/selectors/' + selectorContext.selectorType + '/' + dasherize(options.name) + '-' + selectorContext.selectorType + '.selectors';
 
-        const stateRelativePath = relative(join(options.path, path), options.path + '/' + stateContext.rootStateFileName);
-        const selectorRelativePath = relative(join(options.path, path), options.path + '/' + selectorContext.rootSelectorFileName);
+        const stateRelativePath = buildRelativePath(join(options.path, path), options.path + '/' + stateContext.rootStateFileName);
+        const selectorRelativePath = buildRelativePath(join(options.path, path), options.path + '/' + selectorContext.rootSelectorFileName);
 
         const text = host.read(normalize(options.path + '/' + path + '.ts'));
         if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
