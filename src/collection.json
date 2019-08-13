@@ -20,6 +20,11 @@
       "description": "Adds an effect to an existing state build",
       "factory": "./add-effect/index",
       "schema": "./add-effect/schema.json"
+    },
+    "add-reducer": {
+      "description": "Adds a reducer to closest combine reducer",
+      "factory": "./add-reducer/index",
+      "schema": "./add-reducer/schema.json"
     }
   }
 }
