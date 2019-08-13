@@ -4,7 +4,7 @@ import {Actions} from '@ngrx/effects';
 @Injectable()
 export class <%= classify(name) %>Effects {
 
-    constructor(private actions$: Actions){
+    constructor(private actions$: Actions) {
     }
 
 }
