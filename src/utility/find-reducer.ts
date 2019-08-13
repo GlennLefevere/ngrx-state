@@ -3,11 +3,11 @@ import {Path} from '@angular-devkit/core';
 import {getSourceNodes, insertImport} from './find-module';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
-import {InsertChange} from '@schematics/angular/utility/change';
 import * as ts from 'typescript';
 import {normalize} from 'path';
 import {functionIze} from './function-ize';
 import {findFile} from './find-file';
+import {Change, InsertChange} from "./change";
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
@@ -76,7 +76,7 @@ export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]
     return new InsertChange(context.rootReducerFileName, positon + 1, toAdd);
 }
 
-export function buildAddReducerChanges(context: AddReducerContext, host: Tree, options: any): InsertChange[] {
+export function buildAddReducerChanges(context: AddReducerContext, host: Tree, options: any): Change[] {
     const text = host.read(normalize(options.path + '/' + context.rootReducerFileName + '.ts'));
     if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
     const sourceText = text.toString('utf-8');
@@ -87,6 +87,6 @@ export function buildAddReducerChanges(context: AddReducerContext, host: Tree, o
 
     return [
         createReducerChange(context, nodes),
-        insertImport(sourceFile, context.rootReducerFileName, functionIze(context.reducerName), context.relativeReducerFileName) as InsertChange
+        insertImport(sourceFile, context.rootReducerFileName, functionIze(context.reducerName), context.relativeReducerFileName)
     ];
 }

@@ -74,7 +74,7 @@ export function addImports(options: any, selectorContext: AddSelectorContext, st
 
         const stateSourceFile = ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
 
-        console.log(stateSourceFile, path, options.selectorName, selectorRelativePath);
+        //console.log(stateSourceFile, path, options.selectorName, selectorRelativePath);
 
         let changes = [
             insertImport(stateSourceFile, path, options.selectorName, selectorRelativePath),

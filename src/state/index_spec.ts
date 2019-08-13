@@ -74,6 +74,11 @@ describe('ngrx-state', () => {
 
         const moduleContent = tree.readContent(module);
 
+        console.log(tree.files);
+
+        console.log(tree.readContent('/projects/bar/src/app/statemanagement/state/bar-root.state.ts'));
+        console.log(tree.readContent('/projects/bar/src/app/statemanagement/reducers/bar-root.reducer.ts'));
+
         expect(tree.files).toContain('/projects/bar/src/app/statemanagement/reducers/bar-root.reducer.ts');
         expect(tree.files).toContain('/projects/bar/src/app/statemanagement/reducers/data/bar-data.reducer.ts');
         expect(tree.files).toContain('/projects/bar/src/app/statemanagement/reducers/container/bar-container.reducer.ts');

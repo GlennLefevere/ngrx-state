@@ -4,6 +4,7 @@ import {copyFiles} from '../utility/copy-files';
 import {buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
 import {addImports, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
 import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
+import {InsertChange} from "../utility/change";
 
 export default function (options: DataStateSchematics): Rule {
     return (tree: Tree, _context: SchematicContext) => {
@@ -47,7 +48,9 @@ function addReducer(options: any): Rule {
 
         const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootReducerFileName + '.ts');
         for (const change of changes) {
-            declarationRecorder.insertLeft(change.pos, change.toAdd);
+            if(change instanceof InsertChange) {
+                declarationRecorder.insertLeft(change.pos, change.toAdd);
+            }
         }
         host.commitUpdate(declarationRecorder);
 
@@ -64,7 +67,7 @@ function addState(options: any): Rule {
         const declarationRecorder = host.beginUpdate(options.path + '/' + context.rootStateFileName + '.ts');
 
         for (const change of changes) {
-            if (typeof change !== undefined) {
+            if (change instanceof InsertChange) {
                 declarationRecorder.insertLeft(change.pos, change.toAdd);
             }
         }

@@ -84,10 +84,10 @@ export function findModule(host: Tree, generateDir: string): Path {
  * Function to find the "closest" module to a generated file's path.
  */
 export function findRootReducer(host: Tree, generateDir: string): Path {
-    console.log('findRootReducer ' + generateDir);
+    // console.log('findRootReducer ' + generateDir);
     let dir: DirEntry | null = host.getDir('/' + generateDir);
-    console.log(dir.subfiles);
-    console.log(dir.subdirs);
+    // console.log(dir.subfiles);
+    // console.log(dir.subdirs);
 
     const moduleRe = /-root\.reducer\.ts$/;
 

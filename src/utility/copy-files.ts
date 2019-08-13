@@ -1,4 +1,4 @@
-import {apply, mergeWith, move, Rule, template, url} from '@angular-devkit/schematics';
+import {apply, MergeStrategy, mergeWith, move, Rule, template, url} from '@angular-devkit/schematics';
 import {strings} from '@angular-devkit/core';
 import {concatAndFunctionIze, functionIze} from './function-ize';
 import {concatAndCamelize} from './concat-and-camelize';
@@ -20,5 +20,5 @@ export function copyFiles(options: any, templatePath: string, parsedPath: string
             }),
             move(parsedPath)
         ],
-    ));
+    ), MergeStrategy.Overwrite);
 }
