@@ -5,9 +5,9 @@ import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {constructDestinationPath} from './find-reducer';
 import {normalize} from "path";
-import * as ts from 'typescript';
-import {getSourceNodes, insertImport} from './find-module';
-import {Change, InsertChange} from "./change";
+import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import {Change, InsertChange} from "@schematics/angular/utility/change";
+import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
@@ -25,7 +25,7 @@ export interface AddStateContext {
 export function createAddStateContext(host: Tree, options: any, stateType: string): AddStateContext {
     const rootStateFileName = findRootState(host, options.path).replace('.ts', '');
     const stateName = dasherize(options.name + classify(stateType) + 'State');
-    const stateFileName = constructDestinationPath(options, stateType, 'state', 'state');
+    const stateFileName = constructDestinationPath(options, 'state', 'state', stateType);
     const relativeStateFileName = buildRelativePath(options.path + '/' + rootStateFileName, stateFileName);
 
     return {
