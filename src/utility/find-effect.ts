@@ -1,18 +1,17 @@
 import {SchematicsException, Tree} from "@angular-devkit/schematics";
 import {Path} from "@angular-devkit/core";
-import {findFile} from "./find-file";
+import {findFile, getSourceFile} from "./find-file";
 import {classify, dasherize} from "@angular-devkit/core/src/utils/strings";
 import {buildRelativePath} from "@schematics/angular/utility/find-module";
 import {constructDestinationPath} from "./find-reducer";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
-import {normalize} from "path";
 import * as ts from "@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 
-export function findRootEffects(host: Tree, generateDir: string): Path {
+export function findRootEffects(host: Tree, generateDir?: string): Path {
     const moduleRe = /-root\.effects\.ts$/;
 
-    return findFile(host, generateDir, moduleRe);
+    return findFile(host, moduleRe, generateDir);
 }
 
 export interface AddEffectsContext {
@@ -54,14 +53,14 @@ function createRootEffectsChanges(context: AddEffectsContext, nodes: ts.Node[]):
     }
 
     const syntaxListNode = arrayNode.getChildren().find(n => n.kind === ts.SyntaxKind.SyntaxList);
-    if(!syntaxListNode) {
+    if (!syntaxListNode) {
         throw new SchematicsException(`expectyed syntaxlist in ${context.rootEffectsName}`);
     }
 
     let postFix = '';
     let positon: number = syntaxListNode.pos;
 
-    if(syntaxListNode.getChildren().length > 0) {
+    if (syntaxListNode.getChildren().length > 0) {
         postFix = ', ';
     }
 
@@ -70,11 +69,7 @@ function createRootEffectsChanges(context: AddEffectsContext, nodes: ts.Node[]):
 }
 
 export function buildAddEffectsChanges(host: Tree, context: AddEffectsContext, options: any): Change[] {
-    const text = host.read(normalize(options.path + '/' + context.rootEffectsName + '.ts'));
-    if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
-    const sourceText = text.toString('utf-8');
-
-    const sourceFile = ts.createSourceFile(context.rootEffectsName, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+    const sourceFile = getSourceFile(host, options.path, context.rootEffectsName);
 
     const nodes = getSourceNodes(sourceFile);
 

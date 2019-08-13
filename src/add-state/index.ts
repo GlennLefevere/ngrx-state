@@ -1,35 +1,20 @@
-import {chain, Rule, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
+import {chain, Rule, SchematicContext, Tree} from '@angular-devkit/schematics';
 import {copyFiles} from '../utility/copy-files';
 import {buildAddStateChanges, createAddStateContext, getStateName} from '../utility/find-state';
 import {addImports, createAddSelectorContext, getSelectorName} from '../utility/find-selector';
 import {buildAddReducerChanges, createAddReducerContext} from '../utility/find-reducer';
-import {getWorkspace} from "@schematics/angular/utility/config";
-import {buildDefaultPath} from "@schematics/angular/utility/project";
-import {parseName} from "@schematics/angular/utility/parse-name";
 import {applyChanges} from "../utility/change";
+import {enrichOptions} from '../utility/options';
 
 export default function (options: AddStateSchematics): Rule {
-    return (tree: Tree, _context: SchematicContext) => {
-        const workspace = getWorkspace(tree);
-        if (!options.project) {
-            throw new SchematicsException('Option (project) is required.');
-        }
+    return (host: Tree, _context: SchematicContext) => {
+        options = enrichOptions(host, options);
 
-        const project = workspace.projects[options.project];
+        const selectorContext = createAddSelectorContext(host, options, options.type);
+        const stateContext = createAddStateContext(host, options, options.type);
 
-        if (options.path === undefined) {
-            options.path = buildDefaultPath(project);
-        }
-
-        const parsedPath = parseName(options.path, options.name);
-        options.name = parsedPath.name;
-        options.path = parsedPath.path;
-
-        const selectorContext = createAddSelectorContext(tree, options, options.type);
-        const stateContext = createAddStateContext(tree, options, options.type);
-
-        options.selectorName = getSelectorName(selectorContext, tree, options);
-        options.stateName = getStateName(stateContext, tree, options);
+        options.selectorName = getSelectorName(selectorContext, host, options);
+        options.stateName = getStateName(stateContext, host, options);
 
         return chain(
             [
