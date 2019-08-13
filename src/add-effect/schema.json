@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "AddEffectSchematics",
+  "title": "Add-effect Options Schema",
+  "type": "object",
+  "description": "Add effect to module",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": {
+        "message": "What name should the state have?"
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the component.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "module": {
+      "type": "string",
+      "description": "The module to update"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

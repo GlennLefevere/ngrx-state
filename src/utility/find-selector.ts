@@ -3,12 +3,12 @@ import {Path} from '@angular-devkit/core';
 import {findFile} from './find-file';
 import {join, normalize, relative} from 'path';
 import {constructDestinationPath} from './find-reducer';
-import * as ts from 'typescript';
-import {getSourceNodes, insertImport} from './find-module';
+import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {AddStateContext} from './find-state';
 import {dasherize} from '@angular-devkit/core/src/utils/strings';
-import {InsertChange} from './change';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
+import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
+import {InsertChange} from "@schematics/angular/utility/change";
 
 export function findRootSelector(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.selectors\.ts$/;
@@ -24,7 +24,7 @@ export interface AddSelectorContext {
 
 export function createAddSelectorContext(host: Tree, options: any, selectorType: string): AddSelectorContext {
     const rootSelectorFileName = findRootSelector(host, options.path).replace('.ts', '');
-    const selectorPath = constructDestinationPath(options, selectorType, 'selectors', 'selectors');
+    const selectorPath = constructDestinationPath(options, 'selectors', 'selectors',selectorType);
     const relativeSelectorFileName = relative(selectorPath, options.path + '/' + rootSelectorFileName);
 
     return {

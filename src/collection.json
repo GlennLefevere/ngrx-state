@@ -1,20 +1,25 @@
 {
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
-    "state": {
+    "init-state": {
       "description": "Adds a complete ngrx state setup to a module.",
-      "factory": "./state/index",
-      "schema": "./state/schema.json"
+      "factory": "./init-state/index",
+      "schema": "./init-state/schema.json"
     },
-    "container-state": {
-      "description": "Adds container state to an existing state",
-      "factory": "./container-state/index",
-      "schema": "./container-state/schema.json"
+    "init-effects": {
+      "description": "Adds effects setup to existing state setup",
+      "factory": "./init-effects/index",
+      "schema": "./init-effects/schema.json"
     },
-    "data-state": {
-      "description": "Adds data state to an existing state",
-      "factory": "./data-state/index",
-      "schema": "./data-state/schema.json"
+    "add-state": {
+      "description": "Adds a state level to an existing state",
+      "factory": "./add-state/index",
+      "schema": "./add-state/schema.json"
+    },
+    "add-effect": {
+      "description": "Adds an effect to an existing state build",
+      "factory": "./add-effect/index",
+      "schema": "./add-effect/schema.json"
     }
   }
 }

@@ -1,13 +1,13 @@
 import {SchematicsException, Tree} from '@angular-devkit/schematics';
 import {Path} from '@angular-devkit/core';
-import {getSourceNodes, insertImport} from './find-module';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
-import * as ts from 'typescript';
+import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {normalize} from 'path';
 import {functionIze} from './function-ize';
 import {findFile} from './find-file';
-import {Change, InsertChange} from "./change";
+import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
+import {Change, InsertChange} from "@schematics/angular/utility/change";
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
@@ -26,7 +26,7 @@ export interface AddReducerContext {
 export function createAddReducerContext(host: Tree, options: any, reducerType: string): AddReducerContext {
     const rootReducerFileName = findRootReducer(host, options.path).replace('.ts', '');
     const reducerName = dasherize(options.name + classify(reducerType) + 'Reducer');
-    const reducerFileName = constructDestinationPath(options, reducerType, 'reducers', 'reducer');
+    const reducerFileName = constructDestinationPath(options, 'reducers', 'reducer', reducerType);
     const relativeReducerFileName = buildRelativePath(options.path + '/' + rootReducerFileName, reducerFileName);
 
     return {
@@ -37,9 +37,20 @@ export function createAddReducerContext(host: Tree, options: any, reducerType: s
     }
 }
 
-export function constructDestinationPath(options: any, reducerType: string, folder: string, extention: string): string {
-    return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name ) + '-' + reducerType + '.' + extention;
+export function constructDestinationPath(options: any, folder: string, extention: string, reducerType?: string): string {
+    if (reducerType)
+        return constructDestinationPathWithType(options, folder, extention, reducerType);
+    return constructDestinationPathWithoutType(options, folder, extention);
 }
+
+function constructDestinationPathWithoutType(options: any, folder: string, extention: string): string {
+    return options.path + '/statemanagement/' + folder + '/' + dasherize(options.name) + '.' + extention;
+}
+
+function constructDestinationPathWithType(options: any, folder: string, extention: string, reducerType: string) {
+    return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name) + '-' + reducerType + '.' + extention;
+}
+
 
 export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
     let toAdd = '\n  ' + context.reducerType + ': ' + functionIze(context.reducerName) + ',';
