@@ -24,6 +24,7 @@ const appOptions = {
 
 describe('add-effect', () => {
     beforeEach(async () => {
+        console.log('\nadd-effect start');
         appTree = await runner.runExternalSchematicAsync(
             '@schematics/angular',
             'workspace',
@@ -35,6 +36,10 @@ describe('add-effect', () => {
             appOptions,
             appTree
         ).toPromise();
+    });
+
+    afterEach(() => {
+        console.log('add-effect end\n');
     });
 
     it('works with effects', async () => {
@@ -51,6 +56,27 @@ describe('add-effect', () => {
             project: 'bar',
         }, appTree).toPromise();
     });
+
+    it('works with multiple effects', async () => {
+        appTree = await runner.runSchematicAsync('init-state', {
+            name: 'bar',
+            data: true,
+            container: true,
+            effects: true,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+        appTree = await runner.runSchematicAsync('add-effect', {
+            name: 'bar',
+            project: 'bar',
+        }, appTree).toPromise();
+
+        await runner.runSchematicAsync('add-effect', {
+            name: 'fu',
+            project: 'bar',
+        }, appTree).toPromise();
+    });
+
 
     // Disabled til init-effects is built
     it('works without effects', async () => {

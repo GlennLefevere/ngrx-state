@@ -1,7 +1,7 @@
 import {SchematicsException, Tree} from "@angular-devkit/schematics";
 import {Path} from "@angular-devkit/core";
 import {findFile, getSourceFile} from "./find-file";
-import {classify, dasherize} from "@angular-devkit/core/src/utils/strings";
+import {classify} from "@angular-devkit/core/src/utils/strings";
 import {buildRelativePath} from "@schematics/angular/utility/find-module";
 import {constructDestinationPath} from "./find-reducer";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
@@ -22,7 +22,7 @@ export interface AddEffectsContext {
 
 export function createAddEffectsContext(host: Tree, options: any): AddEffectsContext {
     let rootEffectsName = findRootEffects(host, options.path).replace('.ts', '');
-    const effectsName = dasherize(options.name + 'Effects');
+    const effectsName = classify(options.name + 'Effects');
     const effectsFileName = constructDestinationPath(options, 'effects', 'effects');
     const relativeEffectsFileName = buildRelativePath(options.path + '/' + rootEffectsName, effectsFileName);
 
