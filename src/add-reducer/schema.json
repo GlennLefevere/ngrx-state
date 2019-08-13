@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "AddReducerSchematics",
+  "title": "Add-reducer Options Schema",
+  "type": "object",
+  "description": "Add effect to module",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": {
+        "message": "What name should the state have?"
+      }
+    },
+    "stateLevel": {
+      "type": "string",
+      "description": "The state level",
+      "$default": {
+        "$source": "argv",
+        "index": 1
+      },
+      "x-prompt": {
+        "message": "What is the state level you want to add the reducer to?"
+      }
+    },
+    "className": {
+      "type": "string",
+      "description": "Is returned type",
+      "$default": {
+        "$source": "argv",
+        "index": 2
+      },
+      "x-prompt": {
+        "message": "What is the return class?"
+      }
+    },
+    "array": {
+      "type": "boolean",
+      "description": "Is return value array",
+      "$default": {
+        "$source": "argv",
+        "index": 3
+      },
+      "x-prompt": {
+        "message": "Is the return value an array of objects?"
+      }
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to create the component.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "module": {
+      "type": "string",
+      "description": "The module to update"
+    }
+  },
+  "required": [
+    "name",
+    "stateLevel",
+    "className",
+    "array"
+  ]
+}
