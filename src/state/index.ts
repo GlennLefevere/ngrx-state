@@ -1,4 +1,4 @@
-import {chain, noop, Rule, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
+import {chain, noop, Rule, schematic, SchematicContext, SchematicsException, Tree} from '@angular-devkit/schematics';
 import {strings} from '@angular-devkit/core';
 import {
     addImportToModule,
@@ -47,8 +47,8 @@ export default function (options: StateSchematics): Rule {
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
             copyFiles(options, './files/default', parsedPath.path),
             addImport(options, rootReducerName, '/statemanagement/reducers/'),
-            !data ? noop() : copyFiles(options, './files/data', parsedPath.path),
-            !container ? noop() : copyFiles(options, './files/container', parsedPath.path),
+            !data ? noop() : schematic('data-state', buildStateProperties('data', options)),
+            !container ? noop() : schematic('data-state', buildStateProperties('container', options)),
             !effects ? noop() : copyFiles(options, './files/effects', parsedPath.path),
             !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
             !effects ? noop() : addImport(options, rootEffectsName, '/statemanagement/effects/'),
@@ -107,4 +107,14 @@ export function addImport(options: any, classToImport: string, path: string): Ru
 
         return host;
     }
+}
+
+function buildStateProperties(type: string, options: StateSchematics): any {
+    return {
+        path: options.path,
+        name: options.name,
+        type,
+        project: options.project,
+        module: options.module
+    };
 }

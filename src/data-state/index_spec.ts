@@ -47,7 +47,7 @@ describe('data-state', () => {
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-        const tree = await runner.runSchematicAsync('data-state', {
+        await runner.runSchematicAsync('data-state', {
             name: 'bar',
             type: 'custom',
             project: 'bar',
@@ -55,7 +55,7 @@ describe('data-state', () => {
         }, appTree).toPromise();
 
         // console.log(tree.files);
-        console.log(tree.readContent('/projects/bar/src/app/statemanagement/selectors/custom/bar-custom.selectors.ts'));
+        // console.log(tree.readContent('/projects/bar/src/app/statemanagement/selectors/custom/bar-custom.selectors.ts'));
     });
 
 

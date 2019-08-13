@@ -4,10 +4,10 @@ import {findFile} from './find-file';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {constructDestinationPath} from './find-reducer';
-import {InsertChange} from '@schematics/angular/utility/change';
 import {normalize} from "path";
 import * as ts from 'typescript';
 import {getSourceNodes, insertImport} from './find-module';
+import {Change, InsertChange} from "./change";
 
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
@@ -62,7 +62,7 @@ function createStateChange(context: AddStateContext, nodes: ts.Node[]): InsertCh
     return new InsertChange(context.rootStateFileName, positon + 1, toAdd);
 }
 
-export function buildAddStateChanges(context: AddStateContext, host: Tree, options: any): InsertChange[] {
+export function buildAddStateChanges(context: AddStateContext, host: Tree, options: any): Change[] {
     const text = host.read(normalize(options.path + '/' + context.rootStateFileName + '.ts'));
     if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
     const sourceText = text.toString('utf-8');
@@ -73,7 +73,7 @@ export function buildAddStateChanges(context: AddStateContext, host: Tree, optio
 
     return [
         createStateChange(context, nodes),
-        insertImport(sourceFile, context.rootStateFileName, classify(context.stateName), context.relativeStateFileName) as InsertChange
+        insertImport(sourceFile, context.rootStateFileName, classify(context.stateName), context.relativeStateFileName)
     ];
 }
 
