@@ -36,12 +36,9 @@ export default function (options: InitStateSchematics): Rule {
         const rootReducerName = functionIze(strings.classify(`${options.name}RootReducer`));
         const storeName = `StoreModule.forFeature('${options.name}', ${rootReducerName})`;
 
-        /*const rootEffectsName = strings.classify(`${options.name}RootEffects`);
-        const effectsName = `EffectsModule.forFeature(${rootEffectsName}),`;*/
-
         return chain([
             addNgrxImportsToNgModule(options.module, '@ngrx/store', storeName),
-            copyFiles(options, './files/default', parsedPath.path),
+            copyFiles(options, './files', parsedPath.path),
             addImport(options, rootReducerName, '/statemanagement/reducers/'),
             !data ? noop() : schematic('add-state', buildStateProperties('data', options)),
             !container ? noop() : schematic('add-state', buildStateProperties('container', options)),
@@ -49,10 +46,7 @@ export default function (options: InitStateSchematics): Rule {
                 name: options.name,
                 path: options.path,
                 project: options.project
-            }),
-            /*            !effects ? noop() : copyFiles(options, './files/effects', parsedPath.path),
-                        !effects ? noop : addNgrxImportsToNgModule(options.module, '@ngrx/effects', effectsName),
-                        !effects ? noop() : addImport(options, rootEffectsName, '/statemanagement/effects/'),*/
+            })
         ])(tree, _context);
     };
 }
