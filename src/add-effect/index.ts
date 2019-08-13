@@ -1,8 +1,4 @@
-import {chain, noop, Rule, schematic, SchematicContext, SchematicsException, Tree} from "@angular-devkit/schematics";
-import {getWorkspace} from "@schematics/angular/utility/config";
-import {buildDefaultPath} from "@schematics/angular/utility/project";
-import {findModuleFromOptions} from "@schematics/angular/utility/find-module";
-import {parseName} from "@schematics/angular/utility/parse-name";
+import {chain, noop, Rule, schematic, SchematicContext, Tree} from "@angular-devkit/schematics";
 import {copyFiles} from "../utility/copy-files";
 import {
     AddEffectsContext,
@@ -11,25 +7,12 @@ import {
     findRootEffects
 } from "../utility/find-effect";
 import {applyChanges} from "../utility/change";
+import {enrichOptions} from '../utility/options';
 
-export default function(options: AddEffectSchematics): Rule {
+export default function (options: AddEffectSchematics): Rule {
     return (host: Tree, context: SchematicContext) => {
-        const workspace = getWorkspace(host);
-        if (!options.project) {
-            throw new SchematicsException('Option (project) is required.');
-        }
 
-        const project = workspace.projects[options.project];
-
-        if (options.path === undefined) {
-            options.path = buildDefaultPath(project);
-        }
-
-        options.module = findModuleFromOptions(host, options);
-
-        const parsedPath = parseName(options.path, options.name);
-        options.name = parsedPath.name;
-        options.path = parsedPath.path;
+        options = enrichOptions(host, options);
 
         let rootEffectsExist = true;
         try {
@@ -45,7 +28,7 @@ export default function(options: AddEffectSchematics): Rule {
                 path: options.path,
                 project: options.project
             }),
-            copyFiles(options, './files', parsedPath.path),
+            copyFiles(options, './files', options.path),
             addImportToRootState(options)
         ])(host, context);
     }

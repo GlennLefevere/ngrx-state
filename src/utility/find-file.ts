@@ -1,8 +1,9 @@
 import {DirEntry, SchematicsException, Tree} from '@angular-devkit/schematics';
 import {join, Path} from '@angular-devkit/core';
 import * as ts from "@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript";
+import {normalize} from "path";
 
-export function findFile(host: Tree, generateDir: string, regex: RegExp): Path {
+export function findFile(host: Tree, regex: RegExp, generateDir?: string): Path {
     let dir: DirEntry | null = host.getDir('/' + generateDir);
 
     let result = determineFilePath(dir, host, regex);
@@ -58,4 +59,9 @@ export function readIntoSourceFile(host: Tree, modulePath: string): ts.SourceFil
     const sourceText = text.toString('utf-8');
 
     return ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
+}
+
+export function getSourceFile(host: Tree, optionsPath: string, path: string): ts.SourceFile {
+    const text = normalize(optionsPath + '/' + path + '.ts');
+    return readIntoSourceFile(host, text);
 }

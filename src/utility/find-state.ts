@@ -1,10 +1,9 @@
 import {SchematicsException, Tree} from '@angular-devkit/schematics';
 import {Path} from '@angular-devkit/core';
-import {findFile} from './find-file';
+import {findFile, getSourceFile} from './find-file';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {constructDestinationPath} from './find-reducer';
-import {normalize} from "path";
 import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {Change, InsertChange} from "@schematics/angular/utility/change";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
@@ -12,7 +11,7 @@ import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-util
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
 
-    return findFile(host, generateDir, moduleRe);
+    return findFile(host, moduleRe, generateDir);
 }
 
 export interface AddStateContext {
@@ -63,11 +62,7 @@ function createStateChange(context: AddStateContext, nodes: ts.Node[]): InsertCh
 }
 
 export function buildAddStateChanges(context: AddStateContext, host: Tree, options: any): Change[] {
-    const text = host.read(normalize(options.path + '/' + context.rootStateFileName + '.ts'));
-    if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
-    const sourceText = text.toString('utf-8');
-
-    const sourceFile = ts.createSourceFile(context.rootStateFileName, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+    const sourceFile = getSourceFile(host, options.path, context.rootStateFileName);
 
     const nodes = getSourceNodes(sourceFile);
 
@@ -79,11 +74,7 @@ export function buildAddStateChanges(context: AddStateContext, host: Tree, optio
 
 
 export function getStateName(context: AddStateContext, host: Tree, options: any): string {
-    const text = host.read(normalize(options.path + '/' + context.rootStateFileName + '.ts'));
-    if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
-    const sourceText = text.toString('utf-8');
-
-    const sourceFile = ts.createSourceFile(context.rootStateFileName, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+    const sourceFile = getSourceFile(host, options.path, context.rootStateFileName);
 
     const nodes = getSourceNodes(sourceFile);
 

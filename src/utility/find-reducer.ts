@@ -3,16 +3,15 @@ import {Path} from '@angular-devkit/core';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import {normalize} from 'path';
 import {functionIze} from './function-ize';
-import {findFile} from './find-file';
+import {findFile, getSourceFile} from './find-file';
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
 
-    return findFile(host, generateDir, moduleRe);
+    return findFile(host, moduleRe, generateDir);
 }
 
 export interface AddReducerContext {
@@ -88,11 +87,7 @@ export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]
 }
 
 export function buildAddReducerChanges(context: AddReducerContext, host: Tree, options: any): Change[] {
-    const text = host.read(normalize(options.path + '/' + context.rootReducerFileName + '.ts'));
-    if (!text) throw new SchematicsException(`File ${options.module} does not exist.`);
-    const sourceText = text.toString('utf-8');
-
-    const sourceFile = ts.createSourceFile(context.rootReducerFileName, sourceText, ts.ScriptTarget.Latest, true) as ts.SourceFile;
+    const sourceFile = getSourceFile(host, options.path, context.rootReducerFileName);
 
     const nodes = getSourceNodes(sourceFile);
 
