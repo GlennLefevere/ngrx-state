@@ -4,5 +4,5 @@ import {Action, combineReducers} from '@ngrx/store';
 export function <%= concatAndFunctionIze(name, type) %>Reducer(state: <%= concatAndClassify(name, type) %>State, action: Action) {
   return combineReducers({
     },
-    intitial<%= concatAndClassify(name, type) %>State)(state, action);
+    initial<%= concatAndClassify(name, type) %>State)(state, action);
 }
