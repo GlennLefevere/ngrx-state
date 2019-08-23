@@ -43,9 +43,11 @@ export function createAddReducerContext(host: Tree, options: any, reducerType: s
     }
 }
 
-export function constructDestinationPath(options: any, folder: string, extention: string, reducerType?: string): string {
-    if (reducerType)
+export function constructDestinationPath(options: any, folder: string, extention: string, reducerType?: string, withoutExtenstion: boolean = false): string {
+    if (reducerType && !withoutExtenstion)
         return constructDestinationPathWithType(options, folder, extention, reducerType);
+    else if(reducerType && withoutExtenstion)
+        return constructDestinationPathWithoutExtensionType(options, folder, extention, reducerType);
     return constructDestinationPathWithoutType(options, folder, extention);
 }
 
@@ -57,6 +59,9 @@ function constructDestinationPathWithType(options: any, folder: string, extentio
     return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name) + '-' + reducerType + '.' + extention;
 }
 
+function constructDestinationPathWithoutExtensionType(options: any, folder: string, extention: string, reducerType: string) {
+    return options.path + '/statemanagement/' + folder + '/' + reducerType + '/' + dasherize(options.name) + '.' + extention;
+}
 
 function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
     let toAdd = '\n  ' + context.reducerType + ': ' + functionIze(context.reducerName) + ',';
@@ -106,7 +111,7 @@ interface AddToStateLevelReducerContext {
 export function buildAddToStateLevelReducerContext(host: Tree, options: any): AddToStateLevelReducerContext {
     const destinationReducerPath = options.path + '/' + findReducerForStateLevel(host, options.path, options.stateLevel);
     const reducerFunction = functionIze(options.name) + 'Reducer';
-    const reducerPath = constructDestinationPathWithType(options, 'reducers', 'reducer', options.stateLevel);
+    const reducerPath = constructDestinationPath(options, 'reducers', 'reducer', options.stateLevel, true);
     const relativePath = buildRelativePath(destinationReducerPath, reducerPath);
     const reducerStateName = functionIze(options.name) + (options.array ? 's' : '');
 
