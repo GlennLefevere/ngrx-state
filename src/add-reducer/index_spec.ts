@@ -27,6 +27,12 @@ const classOptions = {
     project: 'bar'
 };
 
+const classOptionsWithDir = {
+    name: 'bar',
+    project: 'bar',
+    path: '/projects/bar/src/app/model'
+};
+
 describe('add-reducer', () => {
     beforeEach(async () => {
         appTree = await runner.runExternalSchematicAsync(
@@ -40,16 +46,17 @@ describe('add-reducer', () => {
             appOptions,
             appTree
         ).toPromise();
+    });
+
+
+    it('works default', async () => {
         appTree = await runner.runExternalSchematicAsync(
             '@schematics/angular',
             'class',
             classOptions,
             appTree
         ).toPromise();
-    });
 
-
-    it('works', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
@@ -59,7 +66,34 @@ describe('add-reducer', () => {
             flat: true
         }, appTree).toPromise();
 
-        const tree = await runner.runSchematicAsync('add-reducer', {
+        await runner.runSchematicAsync('add-reducer', {
+            name: 'bar',
+            stateLevel: 'data',
+            className: 'bar',
+            array: true,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+    });
+
+    it('works with model in other dir', async () => {
+        appTree = await runner.runExternalSchematicAsync(
+            '@schematics/angular',
+            'class',
+            classOptionsWithDir,
+            appTree
+        ).toPromise();
+
+        appTree = await runner.runSchematicAsync('init-state', {
+            name: 'bar',
+            data: true,
+            container: true,
+            effects: true,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+
+        await runner.runSchematicAsync('add-reducer', {
             name: 'bar',
             stateLevel: 'data',
             className: 'bar',
@@ -68,7 +102,5 @@ describe('add-reducer', () => {
             flat: true
         }, appTree).toPromise();
 
-        console.log(tree.readContent('/projects/bar/src/app/statemanagement/reducers/data/bar-data.reducer.ts'));
-        console.log(tree.readContent('/projects/bar/src/app/statemanagement/state/data/bar-data.state.ts',));
     });
 });
