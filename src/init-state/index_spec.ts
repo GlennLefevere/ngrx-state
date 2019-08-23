@@ -39,7 +39,7 @@ describe('init-state', () => {
     });
 
 
-    xit('works', async () => {
+    it('works', async () => {
         const tree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,

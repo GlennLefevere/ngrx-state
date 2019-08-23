@@ -38,7 +38,7 @@ describe('add-state', () => {
     });
 
 
-    xit('works with container', async () => {
+    it('works with container', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
@@ -57,7 +57,7 @@ describe('add-state', () => {
     });
 
 
-    xit('works without data', async () => {
+    it('works without data', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: false,
