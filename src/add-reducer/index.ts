@@ -47,7 +47,7 @@ interface AddClassImportContext {
 }
 
 function createAddClassImportContext(host: Tree, options: any): AddClassImportContext {
-    let importFile = findFileContainingClass(host, options.className, options.path);
+    let importFile = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
     if(!importFile.includes(options.path)) {
         importFile = options.path + '/' + importFile;
     }
