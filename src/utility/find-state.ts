@@ -1,15 +1,22 @@
 import {SchematicsException, Tree} from '@angular-devkit/schematics';
 import {Path} from '@angular-devkit/core';
-import {findFile, getSourceFile} from './find-file';
+import {findFile, findFileContainingClass, getSourceFile, readIntoSourceFile} from './find-file';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {constructDestinationPath} from './find-reducer';
 import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import {Change, InsertChange} from "@schematics/angular/utility/change";
+import {Change, InsertChange, NoopChange} from "@schematics/angular/utility/change";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
+import {findPositionSyntaxLists} from './nodes';
 
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
+
+    return findFile(host, moduleRe, generateDir);
+}
+
+function findStateForStateLevel(host: Tree, generateDir: string, stateLevel: string): Path {
+    const moduleRe = new RegExp(stateLevel + "\.state\.ts");
 
     return findFile(host, moduleRe, generateDir);
 }
@@ -46,17 +53,7 @@ function createStateChange(context: AddStateContext, nodes: ts.Node[]): InsertCh
         throw new SchematicsException(`expected const in ${context.rootStateFileName}`);
     }
 
-    const syntaxList = interfaceNode.getChildren().filter(n => n.kind === ts.SyntaxKind.SyntaxList);
-    let positon: number = 0;
-    if (syntaxList.length > 0) {
-        let result = syntaxList.sort((a, b) => (a.pos > b.pos) ? 1 : -1).map(n => n.pos);
-        positon = result[result.length - 1];
-    } else if (syntaxList.length == 0) {
-        positon = interfaceNode.pos;
-    } else {
-        throw new SchematicsException('InterfaceDeclaration doesn\'t have children for some reason');
-    }
-
+    const positon = findPositionSyntaxLists(interfaceNode);
 
     return new InsertChange(context.rootStateFileName, positon + 1, toAdd);
 }
@@ -92,4 +89,75 @@ function getStateNameFromNodes(context: AddStateContext, nodes: ts.Node[]): stri
     const node = constNode[0];
 
     return node.getFullText().replace(/\s/g, '');
+}
+
+export interface AddStateLevelChangesContext {
+    destinationStateFileName: string;
+    className: string;
+    classRelativePath: string;
+}
+
+export function createAddStateLevelChangesContext(host: Tree, options: any): AddStateLevelChangesContext {
+    const destinationStateFileName = options.path + '/' + findStateForStateLevel(host, options.path, options.stateLevel);
+    const classFileName = findFileContainingClass(host, options.className, options.path);
+    const className = classify(options.className);
+    const classRelativePath = buildRelativePath(destinationStateFileName, classFileName);
+
+    return {
+        destinationStateFileName,
+        className,
+        classRelativePath
+    };
+}
+
+export function buildAddStateLevelChangesContext(context: AddStateLevelChangesContext, host: Tree, options: any): Change[] {
+    const sourceFile = readIntoSourceFile(host, context.destinationStateFileName);
+
+    const nodes = getSourceNodes(sourceFile);
+
+    return [
+        createStateLevelTypeChanges(nodes, options, context),
+        createInitialStateLevelChanges(nodes, options, context),
+        insertImport(sourceFile, context.destinationStateFileName, context.className, context.classRelativePath)
+    ];
+}
+
+function createStateLevelTypeChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
+    const toAdd = '\n  ' + options.name + ': ' + context.className + (options.array ? '[]' : '');
+    const stateTypeDef = nodes.find(n => n.kind === ts.SyntaxKind.TypeAliasDeclaration);
+
+    if (!stateTypeDef) {
+        throw new SchematicsException('State type definition not found');
+    }
+
+    const readOnlyTypeReference = stateTypeDef.getChildren().find(n => n.kind === ts.SyntaxKind.TypeReference);
+
+    if (!readOnlyTypeReference) {
+        throw new SchematicsException('State type is not readonly or doesn\'t exist.');
+    }
+
+    const positon = findPositionSyntaxLists(readOnlyTypeReference);
+
+    return new InsertChange(context.destinationStateFileName, positon + 1, toAdd);
+}
+
+function createInitialStateLevelChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
+    const toAdd = '\n  ' + options.name + ': ' + (options.array ? '[]' : 'undefined');
+
+    const stateVariableDeclaration = nodes.find(n => n.kind === ts.SyntaxKind.VariableDeclaration);
+
+    if(!stateVariableDeclaration) {
+        console.error('Initial state declaration not found.');
+        return new NoopChange();
+    }
+
+    const objectLiteralExpression = stateVariableDeclaration.getChildren().find(n => n.kind === ts.SyntaxKind.ObjectLiteralExpression);
+
+    if (!objectLiteralExpression) {
+        throw new SchematicsException(`expected ObjectLiteralExpression`);
+    }
+
+    const positon = findPositionSyntaxLists(objectLiteralExpression);
+
+    return new InsertChange(context.destinationStateFileName, positon + 1, toAdd);
 }

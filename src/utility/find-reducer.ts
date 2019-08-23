@@ -4,12 +4,19 @@ import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {functionIze} from './function-ize';
-import {findFile, getSourceFile} from './find-file';
+import {findFile, getSourceFile, readIntoSourceFile} from './find-file';
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
+import {findPositionSyntaxLists} from './nodes';
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
+
+    return findFile(host, moduleRe, generateDir);
+}
+
+function findReducerForStateLevel(host: Tree, generateDir: string, stateLevel: string): Path {
+    const moduleRe = new RegExp(stateLevel + "\.reducer\.ts");
 
     return findFile(host, moduleRe, generateDir);
 }
@@ -51,7 +58,7 @@ function constructDestinationPathWithType(options: any, folder: string, extentio
 }
 
 
-export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
+function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): InsertChange {
     let toAdd = '\n  ' + context.reducerType + ': ' + functionIze(context.reducerName) + ',';
     const rootReducerNameArray = context.rootReducerFileName.split('/');
     const rootReducerName = functionIze(rootReducerNameArray[rootReducerNameArray.length - 1].replace('.', '-'));
@@ -72,18 +79,9 @@ export function createReducerChange(context: AddReducerContext, nodes: ts.Node[]
         throw new SchematicsException(`expected ObjectLiteralExpression in ${context.rootReducerFileName}`);
     }
 
-    const syntaxList = objectLiteralExpression.getChildren().filter(n => n.kind === ts.SyntaxKind.SyntaxList);
+    const position = findPositionSyntaxLists(objectLiteralExpression);
 
-    let positon: number = 0;
-    if (syntaxList.length > 0) {
-        let result = syntaxList.sort((a, b) => (a.pos > b.pos) ? 1 : -1).map(n => n.pos);
-        positon = result[result.length - 1];
-    } else if (syntaxList.length == 0) {
-        positon = objectLiteralExpression.pos;
-    } else {
-        throw new SchematicsException('ObjectLiteralExpression doesn\'t have children for some reason');
-    }
-    return new InsertChange(context.rootReducerFileName, positon + 1, toAdd);
+    return new InsertChange(context.rootReducerFileName, position + 1, toAdd);
 }
 
 export function buildAddReducerChanges(context: AddReducerContext, host: Tree, options: any): Change[] {
@@ -95,4 +93,63 @@ export function buildAddReducerChanges(context: AddReducerContext, host: Tree, o
         createReducerChange(context, nodes),
         insertImport(sourceFile, context.rootReducerFileName, functionIze(context.reducerName), context.relativeReducerFileName)
     ];
+}
+
+interface AddToStateLevelReducerContext {
+    reducerFunction: string;
+    destinationReducerPath: string;
+    reducerPath: string;
+    relativePath: string;
+    reducerStateName: string;
+}
+
+export function buildAddToStateLevelReducerContext(host: Tree, options: any): AddToStateLevelReducerContext {
+    const destinationReducerPath = options.path + '/' + findReducerForStateLevel(host, options.path, options.stateLevel);
+    const reducerFunction = functionIze(options.name) + 'Reducer';
+    const reducerPath = constructDestinationPathWithType(options, 'reducers', 'reducer', options.stateLevel);
+    const relativePath = buildRelativePath(destinationReducerPath, reducerPath);
+    const reducerStateName = functionIze(options.name) + (options.array ? 's' : '');
+
+    return {
+        reducerFunction,
+        destinationReducerPath,
+        reducerPath,
+        relativePath,
+        reducerStateName
+    };
+}
+
+// @ts-ignore
+export function createStateLevelReducerChange(host: Tree, context: AddToStateLevelReducerContext): Change {
+    const source = readIntoSourceFile(host, context.destinationReducerPath);
+
+    const nodes = getSourceNodes(source);
+
+    return addStateLevelReducer(context, nodes);
+}
+
+function addStateLevelReducer(context: AddToStateLevelReducerContext, nodes: ts.Node[]): Change {
+    let toAdd = '\n      ' + context.reducerStateName + ': ' + context.reducerFunction + ',';
+
+    const combineReducerReturnNode = nodes.find(n => n.kind === ts.SyntaxKind.CallExpression && n.getFullText().includes('combineReducers') && !n.getFullText().includes('action'));
+
+    if (!combineReducerReturnNode) {
+        throw new SchematicsException("combineReducer return not found!");
+    }
+
+    const combineReducerSyntaxList = combineReducerReturnNode.getChildren().find(n => n.kind === ts.SyntaxKind.SyntaxList);
+
+    if (!combineReducerSyntaxList) {
+        throw new SchematicsException("combineReducer syntax list not found!");
+    }
+
+    const reducerObjectLiteralExpression = combineReducerSyntaxList.getChildren().find(n => n.kind === ts.SyntaxKind.ObjectLiteralExpression);
+
+    if (!reducerObjectLiteralExpression) {
+        throw new SchematicsException("reducer object literal expression not found!");
+    }
+
+    const position = findPositionSyntaxLists(reducerObjectLiteralExpression);
+
+    return new InsertChange(context.destinationReducerPath, position + 1, toAdd);
 }

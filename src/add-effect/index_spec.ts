@@ -42,7 +42,7 @@ describe('add-effect', () => {
         console.log('add-effect end\n');
     });
 
-    it('works with effects', async () => {
+    xit('works with effects', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
@@ -57,7 +57,7 @@ describe('add-effect', () => {
         }, appTree).toPromise();
     });
 
-    it('works with multiple effects', async () => {
+    xit('works with multiple effects', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
@@ -79,7 +79,7 @@ describe('add-effect', () => {
 
 
     // Disabled til init-effects is built
-    it('works without effects', async () => {
+    xit('works without effects', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
