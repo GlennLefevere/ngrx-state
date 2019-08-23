@@ -3,11 +3,11 @@ import {enrichOptions} from '../utility/options';
 import {copyFiles} from '../utility/copy-files';
 import {findFileContainingClass, readIntoSourceFile} from '../utility/find-file';
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
-import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {insertImport} from '@schematics/angular/utility/ast-utils';
 import {applyChanges} from '../utility/change';
 import {buildAddToStateLevelReducerContext, createStateLevelReducerChange} from '../utility/find-reducer';
 import {buildAddStateLevelChangesContext, createAddStateLevelChangesContext} from '../utility/find-state';
+import {buildRelativePath} from '@schematics/angular/utility/find-module';
 
 
 export default function (options: AddReducerSchematics): Rule {
@@ -46,8 +46,11 @@ interface AddClassImportContext {
     className: string;
 }
 
-function createAddClassImportContext(host: Tree, options: AddReducerSchematics): AddClassImportContext {
-    const importFile = findFileContainingClass(host, options.className, options.path);
+function createAddClassImportContext(host: Tree, options: any): AddClassImportContext {
+    let importFile = findFileContainingClass(host, options.className, options.path);
+    if(!importFile.includes(options.path)) {
+        importFile = options.path + '/' + importFile;
+    }
     const className = classify(options.className);
     let classDestinationPath = constructDestinationPathWithType(options, 'reducers', 'reducer', options.stateLevel);
     const classRelativePath = buildRelativePath(classDestinationPath, importFile);

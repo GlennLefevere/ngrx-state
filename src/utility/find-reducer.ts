@@ -119,7 +119,6 @@ export function buildAddToStateLevelReducerContext(host: Tree, options: any): Ad
     };
 }
 
-// @ts-ignore
 export function createStateLevelReducerChange(host: Tree, context: AddToStateLevelReducerContext): Change {
     const source = readIntoSourceFile(host, context.destinationReducerPath);
 
