@@ -20,6 +20,9 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "target": "es6",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "types": [
       "jasmine",
       "node"
@@ -29,7 +32,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/*/files/**/*",
+    "src/**/files/**/*",
     "test-bed/test.module.ts"
   ]
 }

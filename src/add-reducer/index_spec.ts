@@ -59,7 +59,7 @@ describe('add-reducer', () => {
             flat: true
         }, appTree).toPromise();
 
-        await runner.runSchematicAsync('add-reducer', {
+        const tree = await runner.runSchematicAsync('add-reducer', {
             name: 'bar',
             stateLevel: 'data',
             className: 'bar',
@@ -67,5 +67,8 @@ describe('add-reducer', () => {
             project: 'bar',
             flat: true
         }, appTree).toPromise();
+
+        console.log(tree.readContent('/projects/bar/src/app/statemanagement/reducers/data/bar-data.reducer.ts'));
+        console.log(tree.readContent('/projects/bar/src/app/statemanagement/state/data/bar-data.state.ts',));
     });
 });

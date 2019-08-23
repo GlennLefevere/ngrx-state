@@ -6,6 +6,8 @@ import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {insertImport} from '@schematics/angular/utility/ast-utils';
 import {applyChanges} from '../utility/change';
+import {buildAddToStateLevelReducerContext, createStateLevelReducerChange} from '../utility/find-reducer';
+import {buildAddStateLevelChangesContext, createAddStateLevelChangesContext} from '../utility/find-state';
 
 
 export default function (options: AddReducerSchematics): Rule {
@@ -15,7 +17,9 @@ export default function (options: AddReducerSchematics): Rule {
 
         return chain([
             copyFiles(options, './files', options.path),
-            addClassImport(options)
+            addClassImport(options),
+            addToCombineReducer(options),
+            addToStateLevelState(options)
         ])(host, context);
     }
 }
@@ -60,4 +64,30 @@ function createAddClassImportContext(host: Tree, options: AddReducerSchematics):
 
 function constructDestinationPathWithType(options: any, folder: string, extention: string, stateLevel: string) {
     return options.path + '/statemanagement/' + folder + '/' + stateLevel + '/' + dasherize(options.name) + '.' + extention;
+}
+
+function addToCombineReducer(options: any): Rule {
+    return (host: Tree) => {
+        const context = buildAddToStateLevelReducerContext(host, options);
+
+        const source = readIntoSourceFile(host, context.destinationReducerPath);
+
+        const changes = [
+            createStateLevelReducerChange(host, context),
+            insertImport(source, context.destinationReducerPath, context.reducerFunction, context.relativePath)
+        ];
+
+        return applyChanges(host, changes, context.destinationReducerPath);
+    }
+}
+
+function addToStateLevelState(options: any): Rule {
+    return (host: Tree) => {
+
+        const context = createAddStateLevelChangesContext(host, options);
+
+        const changes = buildAddStateLevelChangesContext(context, host, options);
+
+        return applyChanges(host, changes, context.destinationStateFileName);
+    }
 }
