@@ -39,7 +39,7 @@ describe('init-effects', () => {
     });
 
 
-    xit('works', async () => {
+    it('works', async () => {
         appTree = await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
