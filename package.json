@@ -3,7 +3,7 @@
   "repository": {
     "url": "http://localhost:4873"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A blank schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json",
