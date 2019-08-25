@@ -93,7 +93,7 @@ export function createStateLevelSelectorContext(host: Tree, options: any): State
     const selectorFileName = options.path + '/' + findSelectorForStateLevel(host, options.path, options.stateLevel);
     const stateLevelFIleName = options.path + '/' + findStateForStateLevel(host, options.path, options.stateLevel);
     const stateLevelState = determineStateTypeName(host, stateLevelFIleName);
-    const relativePath = buildRelativePath(selectorFileName, stateLevelFIleName);
+    const relativePath = buildRelativePath(selectorFileName, stateLevelFIleName.replace('.ts', ''));
 
     return {
         relativePath,
