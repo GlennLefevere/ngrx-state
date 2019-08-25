@@ -7,7 +7,7 @@ import {functionIze} from './function-ize';
 import {findFile, getSourceFile, readIntoSourceFile} from './find-file';
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
-import {findPositionSyntaxLists} from './nodes';
+import {findNodeByType, findPositionSyntaxLists} from './nodes';
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
@@ -78,11 +78,7 @@ function createReducerChange(context: AddReducerContext, nodes: ts.Node[]): Inse
         throw new SchematicsException(`expected constructor in ${context.rootReducerFileName} to have a parent node`);
     }
 
-    const objectLiteralExpression = constNode.getChildren().find(n => n.kind === ts.SyntaxKind.ObjectLiteralExpression);
-
-    if (!objectLiteralExpression) {
-        throw new SchematicsException(`expected ObjectLiteralExpression in ${context.rootReducerFileName}`);
-    }
+    const objectLiteralExpression = findNodeByType(constNode, ts.SyntaxKind.ObjectLiteralExpression);
 
     const position = findPositionSyntaxLists(objectLiteralExpression);
 
@@ -141,17 +137,9 @@ function addStateLevelReducer(context: AddToStateLevelReducerContext, nodes: ts.
         throw new SchematicsException("combineReducer return not found!");
     }
 
-    const combineReducerSyntaxList = combineReducerReturnNode.getChildren().find(n => n.kind === ts.SyntaxKind.SyntaxList);
+    const combineReducerSyntaxList = findNodeByType(combineReducerReturnNode, ts.SyntaxKind.SyntaxList);
 
-    if (!combineReducerSyntaxList) {
-        throw new SchematicsException("combineReducer syntax list not found!");
-    }
-
-    const reducerObjectLiteralExpression = combineReducerSyntaxList.getChildren().find(n => n.kind === ts.SyntaxKind.ObjectLiteralExpression);
-
-    if (!reducerObjectLiteralExpression) {
-        throw new SchematicsException("reducer object literal expression not found!");
-    }
+    const reducerObjectLiteralExpression = findNodeByType(combineReducerSyntaxList, ts.SyntaxKind.ObjectLiteralExpression);
 
     const position = findPositionSyntaxLists(reducerObjectLiteralExpression);
 

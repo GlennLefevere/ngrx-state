@@ -7,6 +7,7 @@ import {constructDestinationPath} from "./find-reducer";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
 import * as ts from "@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
+import {findNodeByType} from './nodes';
 
 export function findRootEffects(host: Tree, generateDir?: string): Path {
     const moduleRe = /-root\.effects\.ts$/;
@@ -46,16 +47,9 @@ function createRootEffectsChanges(context: AddEffectsContext, nodes: ts.Node[]):
         throw new SchematicsException(`expected constructor in ${context.rootEffectsName} to have a parent node`);
     }
 
-    const arrayNode = constNode.getChildren().find(n => n.kind === ts.SyntaxKind.ArrayLiteralExpression);
+    const arrayNode = findNodeByType(constNode, ts.SyntaxKind.ArrayLiteralExpression);
 
-    if (!arrayNode) {
-        throw new SchematicsException(`expected array in ${context.rootEffectsName}`);
-    }
-
-    const syntaxListNode = arrayNode.getChildren().find(n => n.kind === ts.SyntaxKind.SyntaxList);
-    if (!syntaxListNode) {
-        throw new SchematicsException(`expectyed syntaxlist in ${context.rootEffectsName}`);
-    }
+    const syntaxListNode = findNodeByType(arrayNode, ts.SyntaxKind.SyntaxList);
 
     let postFix = '';
     let positon: number = syntaxListNode.pos;

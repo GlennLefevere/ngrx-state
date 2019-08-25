@@ -71,6 +71,35 @@ describe('add-reducer', () => {
             stateLevel: 'data',
             className: 'bar',
             array: true,
+            selector: false,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+    });
+
+    it('works default with selector', async () => {
+        appTree = await runner.runExternalSchematicAsync(
+            '@schematics/angular',
+            'class',
+            classOptions,
+            appTree
+        ).toPromise();
+
+        appTree = await runner.runSchematicAsync('init-state', {
+            name: 'bar',
+            data: true,
+            container: true,
+            effects: true,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+
+        await runner.runSchematicAsync('add-reducer', {
+            name: 'bar',
+            stateLevel: 'data',
+            className: 'bar',
+            array: true,
+            selector: true,
             project: 'bar',
             flat: true
         }, appTree).toPromise();
@@ -98,6 +127,7 @@ describe('add-reducer', () => {
             stateLevel: 'data',
             className: 'bar',
             array: true,
+            selector: false,
             project: 'bar',
             flat: true
         }, appTree).toPromise();
