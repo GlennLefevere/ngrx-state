@@ -15,3 +15,14 @@ export function findPositionSyntaxLists(node: ts.Node): number {
 
     return position;
 }
+
+
+export function findNodeByType(node: ts.Node, kind: ts.SyntaxKind): ts.Node {
+    const result = node.getChildren().find(n => n.kind === kind);
+
+    if(!result) {
+        throw new SchematicsException(`Could not find type ${kind} in node`);
+    }
+
+    return result;
+}

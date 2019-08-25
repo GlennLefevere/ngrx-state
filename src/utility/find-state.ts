@@ -7,7 +7,7 @@ import {constructDestinationPath} from './find-reducer';
 import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {Change, InsertChange, NoopChange} from "@schematics/angular/utility/change";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
-import {findPositionSyntaxLists} from './nodes';
+import {findNodeByType, findPositionSyntaxLists} from './nodes';
 
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
@@ -15,7 +15,7 @@ export function findRootState(host: Tree, generateDir: string): Path {
     return findFile(host, moduleRe, generateDir);
 }
 
-function findStateForStateLevel(host: Tree, generateDir: string, stateLevel: string): Path {
+export function findStateForStateLevel(host: Tree, generateDir: string, stateLevel: string): Path {
     const moduleRe = new RegExp(stateLevel + "\.state\.ts");
 
     return findFile(host, moduleRe, generateDir);
@@ -133,15 +133,11 @@ function createStateLevelTypeChanges(nodes: ts.Node[], options: any, context: Ad
         throw new SchematicsException('State type definition not found');
     }
 
-    const readOnlyTypeReference = stateTypeDef.getChildren().find(n => n.kind === ts.SyntaxKind.TypeReference);
+    const readOnlyTypeReference = findNodeByType(stateTypeDef, ts.SyntaxKind.TypeReference);
 
-    if (!readOnlyTypeReference) {
-        throw new SchematicsException('State type is not readonly or doesn\'t exist.');
-    }
+    const position = findPositionSyntaxLists(readOnlyTypeReference);
 
-    const positon = findPositionSyntaxLists(readOnlyTypeReference);
-
-    return new InsertChange(context.destinationStateFileName, positon + 1, toAdd);
+    return new InsertChange(context.destinationStateFileName, position + 1, toAdd);
 }
 
 function createInitialStateLevelChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
@@ -154,11 +150,7 @@ function createInitialStateLevelChanges(nodes: ts.Node[], options: any, context:
         return new NoopChange();
     }
 
-    const objectLiteralExpression = stateVariableDeclaration.getChildren().find(n => n.kind === ts.SyntaxKind.ObjectLiteralExpression);
-
-    if (!objectLiteralExpression) {
-        throw new SchematicsException(`expected ObjectLiteralExpression`);
-    }
+    const objectLiteralExpression = findNodeByType(stateVariableDeclaration, ts.SyntaxKind.ObjectLiteralExpression);
 
     const positon = findPositionSyntaxLists(objectLiteralExpression);
 

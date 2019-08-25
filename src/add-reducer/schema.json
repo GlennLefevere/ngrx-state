@@ -49,6 +49,17 @@
         "message": "Is the return value an array of objects?"
       }
     },
+    "selector": {
+      "type": "boolean",
+      "description": "Add selector",
+      "$default": {
+        "$source": "argv",
+        "index": 4
+      },
+      "x-prompt": {
+        "message": "Add selector?"
+      }
+    },
     "path": {
       "type": "string",
       "format": "path",

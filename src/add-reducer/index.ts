@@ -1,4 +1,4 @@
-import {chain, Rule, SchematicContext, Tree} from '@angular-devkit/schematics';
+import {chain, noop, Rule, SchematicContext, Tree} from '@angular-devkit/schematics';
 import {enrichOptions} from '../utility/options';
 import {copyFiles} from '../utility/copy-files';
 import {findFileContainingClass, readIntoSourceFile} from '../utility/find-file';
@@ -8,6 +8,7 @@ import {applyChanges} from '../utility/change';
 import {buildAddToStateLevelReducerContext, createStateLevelReducerChange} from '../utility/find-reducer';
 import {buildAddStateLevelChangesContext, createAddStateLevelChangesContext} from '../utility/find-state';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
+import {addStateLevelSelectorContext, createStateLevelSelectorContext} from '../utility/find-selector';
 
 
 export default function (options: AddReducerSchematics): Rule {
@@ -19,7 +20,8 @@ export default function (options: AddReducerSchematics): Rule {
             copyFiles(options, './files', options.path),
             addClassImport(options),
             addToCombineReducer(options),
-            addToStateLevelState(options)
+            addToStateLevelState(options),
+            options.selector ? addStateLevelSelector(options) : noop()
         ])(host, context);
     }
 }
@@ -48,7 +50,7 @@ interface AddClassImportContext {
 
 function createAddClassImportContext(host: Tree, options: any): AddClassImportContext {
     let importFile = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
-    if(!importFile.includes(options.path)) {
+    if (!importFile.includes(options.path)) {
         importFile = options.path + '/' + importFile;
     }
     const className = classify(options.className);
@@ -92,5 +94,15 @@ function addToStateLevelState(options: any): Rule {
         const changes = buildAddStateLevelChangesContext(context, host, options);
 
         return applyChanges(host, changes, context.destinationStateFileName);
+    }
+}
+
+function addStateLevelSelector(options: any): Rule {
+    return (host: Tree) => {
+        const context = createStateLevelSelectorContext(host, options);
+
+        const changes = addStateLevelSelectorContext(host, options, context);
+
+        return applyChanges(host, changes, context.selectorFileName);
     }
 }
