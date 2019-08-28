@@ -1,21 +1,22 @@
 {
   "name": "@infglef/ngrx-state",
+  "scope": "infglef",
   "version": "0.3.1",
-  "description": "A blank schematics",
+  "description": "Schematics for ngrx state management",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -p tsconfig.json --watch",
     "test": "npm run build && jasmine src/**/*_spec.js",
     "preversion": "npm run test",
-    "release-patch": "npm version patch && npm publish",
-    "release-minor": "npm version minor && npm publish",
-    "release-major": "npm version patch && npm publish",
+    "release-patch": "npm version patch && npm publish --access public",
+    "release-minor": "npm version minor && npm publish --access public",
+    "release-major": "npm version major && npm publish --access public",
     "postversion": "git push"
   },
   "keywords": [
     "schematics"
   ],
-  "author": "",
+  "author": "glenn lefevere",
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
