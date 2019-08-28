@@ -25,6 +25,11 @@
       "description": "Adds a reducer to closest combine reducer",
       "factory": "./add-reducer/index",
       "schema": "./add-reducer/schema.json"
+    },
+    "add-action": {
+      "description": "Adds an action",
+      "factory": "./add-action/index",
+      "schema": "./add-action/schema.json"
     }
   }
 }

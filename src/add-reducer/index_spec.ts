@@ -131,6 +131,39 @@ describe('add-reducer', () => {
             project: 'bar',
             flat: true
         }, appTree).toPromise();
-
     });
+
+    it('works with action type', async () => {
+        appTree = await runner.runExternalSchematicAsync(
+            '@schematics/angular',
+            'class',
+            classOptionsWithDir,
+            appTree
+        ).toPromise();
+
+        appTree = await runner.runSchematicAsync('init-state', {
+            name: 'bar',
+            data: true,
+            container: true,
+            effects: true,
+            project: 'bar',
+            flat: true
+        }, appTree).toPromise();
+
+        appTree = await runner.runSchematicAsync('add-action', {
+            name: 'bar',
+            project: 'bar'
+        }, appTree).toPromise();
+
+        await runner.runSchematicAsync('add-reducer', {
+            name: 'bar',
+            stateLevel: 'data',
+            className: 'bar',
+            array: true,
+            selector: false,
+            project: 'bar',
+            actionType: 'BarActions',
+            flat: true
+        }, appTree).toPromise();
+    })
 });
