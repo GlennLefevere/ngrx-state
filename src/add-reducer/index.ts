@@ -5,7 +5,12 @@ import {findFileContainingClass, readIntoSourceFile} from '../utility/find-file'
 import {classify, dasherize} from '@angular-devkit/core/src/utils/strings';
 import {insertImport} from '@schematics/angular/utility/ast-utils';
 import {applyChanges} from '../utility/change';
-import {buildAddToStateLevelReducerContext, createStateLevelReducerChange} from '../utility/find-reducer';
+import {
+    AddActionTypeContext,
+    buildAddToStateLevelReducerContext,
+    createAddActionTypeContext,
+    createStateLevelReducerChange
+} from '../utility/find-reducer';
 import {buildAddStateLevelChangesContext, createAddStateLevelChangesContext} from '../utility/find-state';
 import {buildRelativePath} from '@schematics/angular/utility/find-module';
 import {addStateLevelSelectorContext, createStateLevelSelectorContext} from '../utility/find-selector';
@@ -16,11 +21,15 @@ export default function (options: AddReducerSchematics): Rule {
 
         options = enrichOptions(host, options);
 
+
+        const addActionTypeContext = createAddActionTypeContext(host, options);
+
         return chain([
             copyFiles(options, './files', options.path),
             addClassImport(options),
             addToCombineReducer(options),
             addToStateLevelState(options),
+            addAction(addActionTypeContext),
             options.selector ? addStateLevelSelector(options) : noop()
         ])(host, context);
     }
@@ -104,5 +113,20 @@ function addStateLevelSelector(options: any): Rule {
         const changes = addStateLevelSelectorContext(host, options, context);
 
         return applyChanges(host, changes, context.selectorFileName);
+    }
+}
+
+//@ts-ignore
+function addAction(context: AddActionTypeContext): Rule {
+    return (host: Tree) => {
+        //console.log(addActionTypeContext);
+        const sourceFile = readIntoSourceFile(host, context.destinationFile);
+
+        /*const nodes = getSourceNodes(sourceFile);*/
+        const changes = [
+            insertImport(sourceFile, context.destinationFile, context.actionType, context.relativePath)
+            ];
+
+        return applyChanges(host, changes, context.destinationFile);
     }
 }

@@ -8,6 +8,7 @@ import {findFile, getSourceFile, readIntoSourceFile} from './find-file';
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 import {Change, InsertChange} from "@schematics/angular/utility/change";
 import {findNodeByType, findPositionSyntaxLists} from './nodes';
+import {findFileContainingType} from './find-action';
 
 export function findRootReducer(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.reducer\.ts$/;
@@ -144,4 +145,27 @@ function addStateLevelReducer(context: AddToStateLevelReducerContext, nodes: ts.
     const position = findPositionSyntaxLists(reducerObjectLiteralExpression);
 
     return new InsertChange(context.destinationReducerPath, position + 1, toAdd);
+}
+
+export interface AddActionTypeContext {
+    actionType: string;
+    relativePath: string;
+    destinationFile: string;
+}
+
+export function createAddActionTypeContext(host: Tree, options: any): AddActionTypeContext {
+    const addActionType = !!options.actionType;
+    const destinationFile = constructDestinationPath(options, 'reducers', 'reducer', options.stateLevel, true) + '.ts';
+    let relativePath = '@ngrx/store';
+    if (addActionType) {
+        const actionTypeFile = options.path + '/' + findFileContainingType(host, classify(options.actionType), options.path);
+        relativePath = buildRelativePath(destinationFile, actionTypeFile.replace('.ts', ''));
+    } else {
+        options.actionType = 'Action';
+    }
+    return {
+        actionType: options.actionType,
+        destinationFile,
+        relativePath
+    }
 }

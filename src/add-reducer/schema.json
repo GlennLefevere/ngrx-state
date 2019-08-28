@@ -49,12 +49,23 @@
         "message": "Is the return value an array of objects?"
       }
     },
+    "actionType": {
+      "type": "string",
+      "description": "Action type",
+      "$default": {
+        "$source": "argv",
+        "index": 4
+      },
+      "x-prompt": {
+        "message": "What is the action type?"
+      }
+    },
     "selector": {
       "type": "boolean",
       "description": "Add selector",
       "$default": {
         "$source": "argv",
-        "index": 4
+        "index": 5
       },
       "x-prompt": {
         "message": "Add selector?"
