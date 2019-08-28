@@ -1,8 +1,5 @@
 {
-  "name": "ngrx-state",
-  "repository": {
-    "url": "http://localhost:4873"
-  },
+  "name": "@infglef/ngrx-state",
   "version": "0.3.0",
   "description": "A blank schematics",
   "scripts": {
