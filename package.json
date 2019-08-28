@@ -1,7 +1,7 @@
 {
   "name": "@infglef/ngrx-state",
   "scope": "infglef",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Schematics for ngrx state management",
   "scripts": {
     "build": "tsc -p tsconfig.json",
