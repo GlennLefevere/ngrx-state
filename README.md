@@ -1,28 +1,39 @@
-# Getting Started With Schematics
+Ngrx-state functions
+============================
+### Using init-state
+Options:
+>
+>    name (The state name)  
+>    data (Boolean that determines whether to add a data level to the state)  
+>    container  (Boolean that determines whether to add a container level to the state)  
+>    path (optional)  
+>    project (optional)  
+>    module (optional)  
+>    
 
-This repository is a basic Schematic implementation that serves as a starting point to create and publish Schematics to NPM.
+Created structure with all options true:
 
-### Testing
-
-To test locally, install `@angular-devkit/schematics-cli` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
-
-Check the documentation with
-```bash
-schematics --help
-```
-
-### Unit Testing
-
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-### Publishing
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
-```
-
-That's it!
- 
+    .
+    ├── ...
+    ├── statemanagement
+    │   ├── effects
+    │   │       └── {name}-root.effects.ts
+    │   ├── reducers
+    │   │       │── container
+    │   │       │    └── {name}-container.reducer.ts
+    │   │       │── data
+    │   │       │    └── {name}-data.reducer.ts
+    │   │       └── {name}-root.reducer.ts
+    │   ├── selectors
+    │   │       │── container
+    │   │       │    └── {name}-container.selectors.ts
+    │   │       │── data
+    │   │       │    └── {name}-data.selectors.ts
+    │   │       └── {name}-root.selectors.ts
+    │   └── state
+    │         │── container
+    │         │    └── {name}-container.state.ts
+    │         │── data
+    │         │    └── {name}-data.state.ts
+    │         └── {name}-root.state.ts
+    └── ...
