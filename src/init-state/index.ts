@@ -26,7 +26,8 @@ export default function (options: InitStateSchematics): Rule {
             !container ? noop() : schematic('add-state', buildStateProperties('container', options)),
             !effects ? noop() : schematic('init-effects', {
                 name: options.name,
-                project: options.project
+                project: options.project,
+                path: options.path
             })
         ])(host, _context);
     };
