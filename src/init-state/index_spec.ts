@@ -97,8 +97,7 @@ describe('init-state', () => {
             },
             appTree
         ).toPromise();
-        console.log(appTree.files);
-        const tree = await runner.runSchematicAsync('init-state', {
+        await runner.runSchematicAsync('init-state', {
             name: 'bar',
             data: true,
             container: true,
@@ -107,8 +106,6 @@ describe('init-state', () => {
             path: '/projects/bar/src/app/bar',
             flat: true
         }, appTree).toPromise();
-        console.log(tree.files);
-        console.log(tree.readContent('/projects/bar/src/app/bar/bar.module.ts'));
     });
 
 });
