@@ -1,5 +1,5 @@
 import {DirEntry, SchematicsException, Tree} from '@angular-devkit/schematics';
-import {join, Path} from '@angular-devkit/core';
+import {join, Path, PathFragment} from '@angular-devkit/core';
 import {getSourceNodes} from '@schematics/angular/utility/ast-utils';
 import {classify} from '@angular-devkit/core/src/utils/strings';
 import {readIntoSourceFile} from './find-file';
@@ -10,11 +10,25 @@ export function findFileContainingType(host: Tree, typeName: string, path?: stri
     let result = determineTypeFilePath(dir, host, typeName, path);
 
     if (result) {
-        return result;
+        return path + '/' + result;
     }
 
     while (dir) {
+        if (!dir.path.includes('app')) {
+            break;
+        }
+        if (dir) {
+            path = dir.path;
+        }
+
         const matches = dir.subfiles.filter(p => testFileContent(host, p, typeName, path));
+
+        if (matches.length == 0) {
+            const res = test(host, typeName, dir, dir.subdirs, path);
+            if (res.length > 0) {
+                return res;
+            }
+        }
 
         if (matches.length == 1) {
             return join(dir.path, matches[0]);
@@ -30,13 +44,34 @@ export function findFileContainingType(host: Tree, typeName: string, path?: stri
         + 'option to skip importing in RootReducer.');
 }
 
+function test(host: Tree, name: string, dir: DirEntry, subDirs: PathFragment[], path?: string): string {
+    for (let subDir of subDirs) {
+        let actualDir = dir.dir(subDir);
+        if (actualDir) {
+            path = actualDir.path;
+        }
+        const matches = actualDir.subfiles.filter(p => testFileContent(host, p, name, path));
+        if (matches.length == 0) {
+            const res = test(host, name, actualDir, actualDir.subdirs, path);
+            if (res.length > 0) {
+                return res;
+            }
+        }
+
+        if (matches.length == 1) {
+            return join(actualDir.path, matches[0]);
+        }
+    }
+    return '';
+}
+
 function testFileContent(host: Tree, dir: Path, typeName: string, path?: string): boolean {
     let result = false;
     const sourceFile = readIntoSourceFile(host, path + '/' + dir);
 
     const nodes = getSourceNodes(sourceFile);
 
-    if(nodes.find(n => n.getFullText().includes('export type ' + classify(typeName)))) {
+    if (nodes.find(n => n.getFullText().includes('export type ' + classify(typeName)))) {
         result = true;
     }
 

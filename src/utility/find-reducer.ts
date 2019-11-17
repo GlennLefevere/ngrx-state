@@ -158,7 +158,7 @@ export function createAddActionTypeContext(host: Tree, options: any): AddActionT
     const destinationFile = constructDestinationPath(options, 'reducers', 'reducer', options.stateLevel, true) + '.ts';
     let relativePath = '@ngrx/store';
     if (addActionType) {
-        const actionTypeFile = options.path + '/' + findFileContainingType(host, classify(options.actionType), options.path);
+        const actionTypeFile = /*options.path + '/' + */findFileContainingType(host, classify(options.actionType), options.path);
         relativePath = buildRelativePath(destinationFile, actionTypeFile.replace('.ts', ''));
     } else {
         options.actionType = 'Action';

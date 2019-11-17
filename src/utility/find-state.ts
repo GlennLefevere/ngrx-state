@@ -99,10 +99,7 @@ export interface AddStateLevelChangesContext {
 
 export function createAddStateLevelChangesContext(host: Tree, options: any): AddStateLevelChangesContext {
     const destinationStateFileName = options.path + '/' + findStateForStateLevel(host, options.path, options.stateLevel);
-    let classFileName = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
-    if(!classFileName.includes(options.path)) {
-        classFileName = options.path + '/' + classFileName;
-    }
+    const classFileName = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
     const className = classify(options.className);
     const classRelativePath = buildRelativePath(destinationStateFileName, classFileName);
 
