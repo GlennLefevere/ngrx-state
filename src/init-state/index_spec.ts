@@ -86,4 +86,29 @@ describe('init-state', () => {
         expect(tree.files).toContain('/projects/bar/src/app/statemanagement/effects/bar-root.effects.ts');
         expect(moduleContent).toEqual(moduleResult);
     });
+
+    it('works with submodule', async () =>{
+        appTree = await runner.runExternalSchematicAsync(
+            '@schematics/angular',
+            'module',
+            {
+                name: 'bar',
+                project: 'bar',
+            },
+            appTree
+        ).toPromise();
+        console.log(appTree.files);
+        const tree = await runner.runSchematicAsync('init-state', {
+            name: 'bar',
+            data: true,
+            container: true,
+            effects: true,
+            project: 'bar',
+            path: '/projects/bar/src/app/bar',
+            flat: true
+        }, appTree).toPromise();
+        console.log(tree.files);
+        console.log(tree.readContent('/projects/bar/src/app/bar/bar.module.ts'));
+    });
+
 });
