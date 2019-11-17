@@ -1,5 +1,5 @@
 import {DirEntry, SchematicsException, Tree} from '@angular-devkit/schematics';
-import {join, Path} from '@angular-devkit/core';
+import {join, Path, PathFragment} from '@angular-devkit/core';
 import * as ts from "@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript";
 import {normalize} from "path";
 import {getSourceNodes} from '@schematics/angular/utility/ast-utils';
@@ -74,11 +74,25 @@ export function findFileContainingClass(host: Tree, className: string, path?: st
     let result = determineClassFilePath(dir, host, className, path);
 
     if (result) {
-        return result;
+        return path + '/' + result;
     }
 
     while (dir) {
+        if (!dir.path.includes('app')) {
+            break;
+        }
+        if (dir) {
+            path = dir.path;
+        }
+
         const matches = dir.subfiles.filter(p => testFileContent(host, p, className, path));
+
+        if (matches.length == 0) {
+            const res = test(host, className, dir, dir.subdirs, path);
+            if (res.length > 0) {
+                return res;
+            }
+        }
 
         if (matches.length == 1) {
             return join(dir.path, matches[0]);
@@ -86,12 +100,32 @@ export function findFileContainingClass(host: Tree, className: string, path?: st
             throw new SchematicsException('More than one class matches ${className}. Use skip-import option to skip importing '
                 + 'the state into the closest class.');
         }
-
         dir = dir.parent;
     }
 
     throw new SchematicsException(`Could not find class ${className}. Use the skip-import`
         + 'option to skip importing in RootReducer.');
+}
+
+function test(host: Tree, name: string, dir: DirEntry, subDirs: PathFragment[], path?: string): string {
+    for (let subDir of subDirs) {
+        let actualDir = dir.dir(subDir);
+        if (actualDir) {
+            path = actualDir.path;
+        }
+        const matches = actualDir.subfiles.filter(p => testFileContent(host, p, name, path));
+        if (matches.length == 0) {
+            const res = test(host, name, actualDir, actualDir.subdirs, path);
+            if (res.length > 0) {
+                return res;
+            }
+        }
+
+        if (matches.length == 1) {
+            return join(actualDir.path, matches[0]);
+        }
+    }
+    return '';
 }
 
 function determineClassFilePath(dirEntry: DirEntry, host: Tree, className: string, path?: string): Path | undefined {
@@ -124,7 +158,7 @@ function testFileContent(host: Tree, dir: Path, className: string, path?: string
 
     const nodes = getSourceNodes(sourceFile);
 
-    if(nodes.find(n => n.getFullText().includes('export class ' + classify(className)))) {
+    if (nodes.find(n => n.getFullText().includes('export class ' + classify(className) + ' '))) {
         result = true;
     }
 

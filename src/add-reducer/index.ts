@@ -58,10 +58,7 @@ interface AddClassImportContext {
 }
 
 function createAddClassImportContext(host: Tree, options: any): AddClassImportContext {
-    let importFile = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
-    if (!importFile.includes(options.path)) {
-        importFile = options.path + '/' + importFile;
-    }
+    const importFile = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
     const className = classify(options.className);
     let classDestinationPath = constructDestinationPathWithType(options, 'reducers', 'reducer', options.stateLevel);
     const classRelativePath = buildRelativePath(classDestinationPath, importFile);
@@ -119,10 +116,8 @@ function addStateLevelSelector(options: any): Rule {
 //@ts-ignore
 function addAction(context: AddActionTypeContext): Rule {
     return (host: Tree) => {
-        //console.log(addActionTypeContext);
         const sourceFile = readIntoSourceFile(host, context.destinationFile);
 
-        /*const nodes = getSourceNodes(sourceFile);*/
         const changes = [
             insertImport(sourceFile, context.destinationFile, context.actionType, context.relativePath)
             ];
