@@ -126,7 +126,7 @@ export function buildAddStateLevelChangesContext(context: AddStateLevelChangesCo
 }
 
 function createStateLevelTypeChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
-    const toAdd = '\n  ' + options.name + (options.array ? 's' : '') + ': ' + context.className + (options.array ? '[]' : '');
+    const toAdd = '\n  ' + options.name + (options.array ? 's' : '') + ': ' + context.className + (options.array ? '[],' : ',');
     const stateTypeDef = nodes.find(n => n.kind === ts.SyntaxKind.TypeAliasDeclaration);
 
     if (!stateTypeDef) {
@@ -141,7 +141,7 @@ function createStateLevelTypeChanges(nodes: ts.Node[], options: any, context: Ad
 }
 
 function createInitialStateLevelChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
-    const toAdd = '\n  ' + options.name + (options.array ? 's' : '') + ': ' + (options.array ? '[]' : 'undefined');
+    const toAdd = '\n  ' + options.name + (options.array ? 's' : '') + ': ' + (options.array ? '[],' : 'undefined,');
 
     const stateVariableDeclaration = nodes.find(n => n.kind === ts.SyntaxKind.VariableDeclaration);
 
