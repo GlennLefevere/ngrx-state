@@ -11,6 +11,7 @@ import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-util
 import {applyChanges} from './change';
 import {Change, InsertChange} from '@schematics/angular/utility/change';
 import {findNodeByType} from './nodes';
+import {functionIze} from './function-ize';
 
 export function findRootSelector(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.selectors\.ts$/;
@@ -127,7 +128,7 @@ function addSelector(nodes: ts.Node[], options: any, context: StateLevelSelector
 
     const selectorIdentifierName = selectorIdentifier.getFullText().trim();
 
-    const name = options.name + (options.array ? 's' : '');
+    const name = functionIze(options.name) + (options.array ? 's' : '');
     const nameClassified = classify(name);
 
     //TODO: fix import for the state
