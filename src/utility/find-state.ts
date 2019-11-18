@@ -8,6 +8,7 @@ import * as ts from '@schematics/angular/third_party/github.com/Microsoft/TypeSc
 import {Change, InsertChange, NoopChange} from "@schematics/angular/utility/change";
 import {getSourceNodes, insertImport} from "@schematics/angular/utility/ast-utils";
 import {findNodeByType, findPositionSyntaxLists} from './nodes';
+import {functionIze} from './function-ize';
 
 export function findRootState(host: Tree, generateDir: string): Path {
     const moduleRe = /-root\.state\.ts$/;
@@ -123,7 +124,7 @@ export function buildAddStateLevelChangesContext(context: AddStateLevelChangesCo
 }
 
 function createStateLevelTypeChanges(nodes: ts.Node[], options: any, context: AddStateLevelChangesContext): Change {
-    const toAdd = '\n  ' + options.name + (options.array ? 's' : '') + ': ' + context.className + (options.array ? '[],' : ',');
+    const toAdd = '\n  ' + functionIze(options.name) + (options.array ? 's' : '') + ': ' + context.className + (options.array ? '[],' : ',');
     const stateTypeDef = nodes.find(n => n.kind === ts.SyntaxKind.TypeAliasDeclaration);
 
     if (!stateTypeDef) {
