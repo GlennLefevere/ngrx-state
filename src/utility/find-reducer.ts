@@ -110,7 +110,7 @@ export function buildAddToStateLevelReducerContext(host: Tree, options: any): Ad
     const reducerFunction = functionIze(options.name) + 'Reducer';
     const reducerPath = constructDestinationPath(options, 'reducers', 'reducer', options.stateLevel, true);
     const relativePath = buildRelativePath(destinationReducerPath, reducerPath);
-    const reducerStateName = functionIze(options.name) + (options.array ? 's' : '');
+    const reducerStateName = functionIze(options.name);
 
     return {
         reducerFunction,
