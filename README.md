@@ -52,7 +52,7 @@ The closest NgModule will then include imports of the ngrx modules StoreModule a
 ### Using add-action
 Options:
 >
->    name (The state name)    
+>    name (The action name)    
 >    path (optional)  
 >    project (optional)  
 >    module (optional)  
@@ -69,7 +69,7 @@ Created structure:
 ### Using add-effect
 Options:
 >
->    name (The state name)    
+>    name (The effect name)    
 >    path (optional)  
 >    project (optional)  
 >    module (optional)  
@@ -115,7 +115,7 @@ Next to creating these files this schematic also adjusts the correlating root-re
 ### Using add-reducer
 Options:
 >
->    name (The state name)
+>    name (The reducer name)
 >    stateLevel (The state level name eg in init-state with data checked then you could use data as a value)
 >    className (The returned class of the reducer)
 >    array (boolean to make the return value of the reducer an array and not a single class) 
@@ -143,7 +143,7 @@ If the selector option is true a selector will be added to the stateLevel select
 ### Using init-effects
 Options:
 >
->    name (The state name)  
+>    name (The effects name)  
 >    path (optional)  
 >    project (optional)  
 >    module (optional)

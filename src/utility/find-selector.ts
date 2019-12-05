@@ -128,7 +128,7 @@ function addSelector(nodes: ts.Node[], options: any, context: StateLevelSelector
 
     const selectorIdentifierName = selectorIdentifier.getFullText().trim();
 
-    const name = functionIze(options.name) + (options.array ? 's' : '');
+    const name = functionIze(options.name);
     const nameClassified = classify(name);
 
     //TODO: fix import for the state
@@ -141,7 +141,7 @@ function addSelector(nodes: ts.Node[], options: any, context: StateLevelSelector
     let result = nodes.sort((a, b) => (a.pos > b.pos) ? 1 : -1).map(n => n.pos);
     const position = result[result.length - 1];
 
-    return new InsertChange(context.selectorFileName, position + 1, toAdd);
+    return new InsertChange(context.selectorFileName, position, toAdd);
 }
 
 function determineStateTypeName(host: Tree, stateFileName: string): string {

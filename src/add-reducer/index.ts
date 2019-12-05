@@ -37,7 +37,6 @@ export default function (options: AddReducerSchematics): Rule {
 
 function addClassImport(options: AddReducerSchematics): Rule {
     return (host: Tree) => {
-
         const context = createAddClassImportContext(host, options);
 
         const source = readIntoSourceFile(host, context.classDestinationPath);
@@ -94,7 +93,6 @@ function addToCombineReducer(options: any): Rule {
 
 function addToStateLevelState(options: any): Rule {
     return (host: Tree) => {
-
         const context = createAddStateLevelChangesContext(host, options);
 
         const changes = buildAddStateLevelChangesContext(context, host, options);
