@@ -154,3 +154,19 @@ function createInitialStateLevelChanges(nodes: ts.Node[], options: any, context:
 
     return new InsertChange(context.destinationStateFileName, positon + 1, toAdd);
 }
+
+export function findStateName(host: Tree, fileName: string): string {
+
+    const sourceFile = readIntoSourceFile(host, fileName + '.ts');
+
+    const nodes = getSourceNodes(sourceFile);
+
+    const stateInterfaceDeclaration = nodes.find(n => n.kind === ts.SyntaxKind.InterfaceDeclaration);
+
+    if(!stateInterfaceDeclaration) {
+        throw new SchematicsException('State interface declaration not found.');
+    }
+    const identifierNode = findNodeByType(stateInterfaceDeclaration, ts.SyntaxKind.Identifier);
+
+    return identifierNode.getFullText().trim();
+}
