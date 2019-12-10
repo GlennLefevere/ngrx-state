@@ -51,7 +51,7 @@ function buildAddStoreContext(host: Tree, options: any): AddStoreContext {
     const destinationFile = options.path + '/sandbox/' + dasherize(options.name) + '.sandbox.ts';
     const rootStateFileName = options.path + '/' + findRootState(host, options.path).replace('.ts', '');
     const rootStateName = findStateName(host, rootStateFileName);
-    const relativePath = buildRelativePath(destinationFile, rootStateFileName + '.ts');
+    const relativePath = buildRelativePath(destinationFile, rootStateFileName);
     return {
         destinationFile,
         rootStateFileName,
@@ -93,11 +93,10 @@ function addRootStateToConstructor(host: Tree, context: AddStoreContext): Change
 
 function provideSandboxInModule(options: any): Rule {
     return (host: Tree) => {
-        const sandboxPath = options.path + '/sandbox/' + dasherize(options.name) + '.sandbox.ts';
+        const sandboxPath = options.path + '/sandbox/' + dasherize(options.name) + '.sandbox';
         const modulePath = options.module;
         const relativePath = buildRelativePath(modulePath, sandboxPath);
 
-        //console.log({sandboxPath, modulePath, relativePath});
         const sourceFile = readIntoSourceFile(host, modulePath);
 
         const changes = addProviderToModule(sourceFile, modulePath, classify(options.name) + 'Sandbox', relativePath);
