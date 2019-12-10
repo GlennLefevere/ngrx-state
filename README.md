@@ -8,6 +8,7 @@ Ngrx-state functions
 * [add-state](#using-add-state)
 * [add-reducer](#using-add-reducer)
 * [init-effects](#using-init-effects)
+* [add-sandbox](#using-add-sandbox)
 
 ### Using init-state
 Options:
@@ -159,3 +160,22 @@ Created structure with all options:
     └── ...
     
 The ngrx effects module will be added as an import to the closest NgModule
+
+
+### Using add-sandbox
+Options:
+>
+>    name (The effects name)  
+>    importRootState (add rootState to constructor)
+>    path (optional)  
+>    project (optional)  
+>    module (optional)
+>   
+
+Created structure with all options:
+
+    .
+    ├── ...
+    ├── sandbox
+    │   └── {name}.sandbox.ts
+    └── ...

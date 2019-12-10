@@ -30,6 +30,11 @@
       "description": "Adds an action",
       "factory": "./add-action/index",
       "schema": "./add-action/schema.json"
+    },
+    "add-sandbox": {
+      "description": "Adds a sandbox",
+      "factory": "./add-sandbox/index",
+      "schema": "./add-sandbox/schema.json"
     }
   }
 }
