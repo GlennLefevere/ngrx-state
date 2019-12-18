@@ -11,7 +11,7 @@
     "release-patch": "npm version patch && npm publish --access public",
     "release-minor": "npm version minor && npm publish --access public",
     "release-major": "npm version major && npm publish --access public",
-    "postversion": "git push"
+    "postversion": "git push && git push origin --tags"
   },
   "keywords": [
     "schematics"
