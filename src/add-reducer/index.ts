@@ -26,7 +26,7 @@ export default function (options: AddReducerSchematics): Rule {
 
         return chain([
             copyFiles(options, './files', options.path),
-            addClassImport(options),
+            options.className === 'any'? noop() : addClassImport(options),
             addToCombineReducer(options),
             addToStateLevelState(options),
             addAction(addActionTypeContext),
