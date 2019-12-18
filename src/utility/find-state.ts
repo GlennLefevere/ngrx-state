@@ -100,9 +100,9 @@ export interface AddStateLevelChangesContext {
 
 export function createAddStateLevelChangesContext(host: Tree, options: any): AddStateLevelChangesContext {
     const destinationStateFileName = options.path + '/' + findStateForStateLevel(host, options.path, options.stateLevel);
-    const classFileName = findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
-    const className = classify(options.className);
-    const classRelativePath = buildRelativePath(destinationStateFileName, classFileName);
+    const classFileName = options.className === 'any' ? '' : findFileContainingClass(host, options.className, options.path).replace('\.ts', '');
+    const className = options.className === 'any' ? options.className : classify(options.className);
+    const classRelativePath = options.className === 'any' ? '' : buildRelativePath(destinationStateFileName, classFileName);
 
     return {
         destinationStateFileName,
@@ -119,7 +119,7 @@ export function buildAddStateLevelChangesContext(context: AddStateLevelChangesCo
     return [
         createStateLevelTypeChanges(nodes, options, context),
         createInitialStateLevelChanges(nodes, options, context),
-        insertImport(sourceFile, context.destinationStateFileName, context.className, context.classRelativePath)
+        context.className === 'any' ? new NoopChange() : insertImport(sourceFile, context.destinationStateFileName, context.className, context.classRelativePath)
     ];
 }
 
