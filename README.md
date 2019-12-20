@@ -1,7 +1,7 @@
 Ngrx-state functions
 ============================
 
-##Schematics:
+## Schematics:
 * [init-state](#using-init-state)
 * [add-action](#using-add-action)
 * [add-effect](#using-add-effect)
